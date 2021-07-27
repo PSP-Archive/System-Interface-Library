@@ -1,0 +1,46 @@
+target remote localhost:10001
+
+# It seems there are no hardware watchpoints on the PSP.
+set can-use-hw-watchpoints 0
+
+# Get the display expressions to line up
+disp/i $pc
+disp/i $pc
+disp/i $pc
+disp/i $pc
+disp/i $pc
+disp/i $pc
+disp/i $pc
+disp/i $pc
+d disp
+
+disp/i $pc
+disp/x $ra
+disp/x $sp
+disp/x $gp
+disp/x $s8
+disp/x $s7
+disp/x $s6
+disp/x $s5
+disp/x $s4
+disp/x $s3
+disp/x $s2
+disp/x $s1
+disp/x $s0
+disp/x $t9
+disp/x $t8
+disp/x $t7
+disp/x $t6
+disp/x $t5
+disp/x $t4
+disp/x $t3
+disp/x $t2
+disp/x $t1
+disp/x $t0
+disp/x $a3
+disp/x $a2
+disp/x $a1
+disp/x $a0
+disp/x $v1
+disp/x $v0
+disp/x $at

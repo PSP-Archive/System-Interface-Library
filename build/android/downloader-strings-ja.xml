@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Strings used by the resource downloader. -->
+    <string name="download_kB">%1$skB</string>
+    <string name="download_MB">%1$sMB</string>
+    <string name="download_GB">%1$sGB</string>
+    <string name="download_kBps">%1$skB/s</string>
+    <string name="download_MBps">%1$sMB/s</string>
+    <string name="download_GBps">%1$sGB/s</string>
+    <string name="download_time_left">残り時間 %1$s</string>
+    <string name="download_notification_time_left">残り%1$s</string>
+    <string name="download_button_pause">ダウンロードを停止</string>
+    <string name="download_button_resume">ダウンロードを再開</string>
+    <string name="download_button_retry">ダウンロードを再試行</string>
+    <string name="download_button_cancel">ダウンロードを中止</string>
+    <string name="download_paused_mobile">モバイルデータ通信でのダウンロードを許可しますか？ 通信契約の内容によっては、お金がかかることがあります。</string>
+    <string name="download_paused_mobile_2">データ通信でのダウンロードを許可しない場合、Wi-Fiネットワークが利用可能になった時点でダウンロードを再開します。</string>
+    <string name="download_button_resume_mobile">データ通信を許可</string>
+    <string name="download_button_wifi_settings">Wi-Fi設定を確認</string>
+    <string name="download_state_idle">ダウンロードの初期処理をしています。</string>
+    <string name="download_state_fetching_url">ダウンロードするデータを探しています。</string>
+    <string name="download_state_connecting">ダウンロードサーバーに接続しています。</string>
+    <string name="download_state_downloading">データをダウンロードしています。</string>
+    <string name="download_state_completed">ダウンロードが完了しました。</string>
+    <string name="download_state_paused_network_unavailable">ダウンロード停止中です（利用可能なネットワークがありません）。</string>
+    <string name="download_state_paused_by_request">ダウンロード停止中です。</string>
+    <string name="download_state_paused_wifi_disabled">ダウンロード停止中です（Wi-Fiが無効になっています）。</string>
+    <string name="download_state_paused_wifi_unavailable">ダウンロード停止中です（利用できるWi-Fiネットワークが見つかりません）。</string>
+    <string name="download_state_paused_network_setup_failure">ネットワークエラーによりダウンロード停止中です。ブラウザーでウェブサイトを開いてみてください。</string>
+    <string name="download_state_paused_roaming">ダウンロード停止中です（ローミング中のため）。</string>
+    <string name="download_state_paused_sdcard_unavailable">ダウンロード停止中です（外部ストレージが見つかりません）。</string>
+    <string name="download_state_failed_unlicensed">ダウンロードが失敗しました（本アプリの購入状況を確認できませんでした）。</string>
+    <string name="download_state_failed_fetching_url">ダウンロードが失敗しました（ダウンロードするデータが見つかりませんでした）。</string>
+    <string name="download_state_failed_sdcard_full">ダウンロードが失敗しました（外部ストレージの空き容量が足りません）。</string>
+    <string name="download_state_failed_canceled">ダウンロードが中止されました。</string>
+    <string name="download_state_failed">ダウンロードが失敗しました。</string>
+
+    <!-- These override strings in the downloader library which are used
+         for notifications, so they should match the style used in other
+         notification messages. -->
+    <string name="state_idle">ダウンロード初期化中です。</string>
+    <string name="state_fetching_url">ダウンロードデータ検索中です。</string>
+    <string name="state_connecting">ダウンロードサーバーに接続中です。</string>
+    <string name="state_downloading">データをダウンロードしています。</string>
+    <string name="state_completed">ダウンロードが完了しました。</string>
+    <string name="state_paused_network_unavailable">ダウンロード停止中（ネットワークが利用できません）。</string>
+    <string name="state_paused_by_request">ダウンロード停止中です。</string>
+    <string name="state_paused_wifi_disabled">ダウンロード停止中（Wi-FiがOFFです）。</string>
+    <string name="state_paused_wifi_unavailable">ダウンロード停止中（Wi-Fiが利用できません）。</string>
+    <string name="state_paused_network_setup_failure">ダウンロード停止中（ブラウザを開いてみてください）。</string>
+    <string name="state_paused_roaming">ダウンロード停止中（ローミング中のため）。</string>
+    <string name="state_paused_sdcard_unavailable">ダウンロード停止中（外部ストレージが見つかりません）。</string>
+    <string name="state_failed_unlicensed">ダウンロード失敗（購入状況を確認できません）。</string>
+    <string name="state_failed_fetching_url">ダウンロード失敗（データが見つかりません）。</string>
+    <string name="state_failed_sdcard_full">ダウンロード失敗（外部ストレージが一杯です）。</string>
+    <string name="state_failed_canceled">ダウンロードが中止されました。</string>
+    <string name="state_failed">ダウンロードが失敗しました。</string>
+</resources>
+

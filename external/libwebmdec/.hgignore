@@ -1,0 +1,7 @@
+syntax: glob
+*.o
+
+syntax: regexp
+^libwebmdec\.
+^webmdec$
+^webmdec-test$

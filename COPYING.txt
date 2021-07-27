@@ -1,0 +1,21 @@
+SIL: System Interface Library for games
+=======================================
+Copyright (c) 2007-2020 Andrew Church <achurch@achurch.org>
+
+SIL may be used under the terms of the GNU General Public License
+version 3 ("GPLv3") or any later version, or as separately agreed with
+the author.
+
+As an additional permission under section 7 of the GPLv3, the use of SIL
+in the following programs shall not cause parts of said programs other
+than SIL to be covered by the GPLv3:
+- "Aquaria" (by Bit Blot, LLC)
+- "FTL: Faster Than Light" (by Subset Games, LLC)
+
+See the file "GPLv3.txt" for the terms of the GPLv3.
+
+Libraries in the "external" directory do not fall under the SIL license.
+See each library's documentation for its license terms.  The file
+"external/README.txt" includes a short description of each library's
+distribution source and license type as well as any changes to the
+library source code that have been made for use with SIL.

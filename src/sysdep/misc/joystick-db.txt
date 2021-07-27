@@ -1,0 +1,317 @@
+#
+# System Interface Library for games
+# Copyright (c) 2007-2020 Andrew Church <achurch@achurch.org>
+# Released under the GNU GPL version 3 or later; NO WARRANTY is provided.
+# See the file COPYING.txt for details.
+#
+# src/sysdep/misc/joystick-db.txt: Configuration database for HID joysticks.
+#
+# This specific file is placed in the public domain.
+#
+
+#
+# This file contains descriptions of all HID (Human Interface Device)
+# compatible joysticks or game controllers known to SIL.  These
+# descriptions are used both to map button inputs to logical button names
+# and to specify D-pad and analog stick input types, since these all vary
+# between devices.
+#
+# Lines beginning with the "#" character are comments ("#" anywhere else on
+# the line has no special meaning).  Any other non-blank lines are joystick
+# descriptions, formatted as follows:
+#
+# <colon-separated-fields> {<quoted-name> [<quoted-name>...] | *}
+#
+# where <colon-separated-fields> is a list of data fields described below,
+# separated by the ":" character, and <quoted-name> is a string enclosed in
+# double quotes (with any double-quote or backslash character inside the
+# string escaped with a backslash).  If the name reported by a device
+# matches any one of the names on a line in this file, the configuration
+# described by that line is applied to the device.
+#
+# Instead of <quoted-name>, a single (unquoted) "*" character may be given
+# to match all controllers which also match the vendor and product IDs for
+# that line (see "vidpid" below).
+#
+# If a device matches multiple entries, the first match is applied, so
+# more-specific entries must be listed before less-specific ones.
+#
+# The following data fields may be used in <colon-separated-fields>.
+#
+# - os=NAME: If present, the definition is only valid on the OS given by
+#   NAME, where NAME is one of the SIL_PLATFORM_* preprocessor symbols
+#   without the SIL_PLATFORM_ prefix (for example, LINUX or WINDOWS).
+#
+# - vidpid=NNNN,NNNN: Specifies the 16-bit vendor and product IDs of the
+#   device as two hexadecimal numbers.  If omitted, the configuration will
+#   be applied to any device whose name matches the line as described
+#   above.
+#
+# - ver=NNNNNNNN,MMMMMMMM: Specifies a 32-bit version code and mask used to
+#   identify a specific hardware revision and/or driver version for the
+#   device.  The configuration is only applied if the bitwise AND of the
+#   system-reported version code and the second value (MMMMMMMM above) is
+#   equal to the specified version code (NNNNNNNN above).  If omitted, both
+#   values are taken to be zero, and the configuration will be applied to
+#   any device which otherwise matches.
+#
+# - lstick=x-<input>,y-<input>[,b-<input>]: Specifies the configuration
+#   for the left analog stick (stick 0).  The first two <input>s give the
+#   input elements for the stick's X and Y axes, respectively; the third
+#   <input>, which is optional, gives the input element for the stick
+#   button (the action of pressing the stick into the device).  If
+#   omitted, the device will not report any events for stick 0.
+#
+# - rstick=x-<input>,y-<input>[,b-<input>]: Specifies the configuration
+#   for the right analog stick (stick 1).  The format is the same as for
+#   the "lstick" field.  If omitted, the device will not report any events
+#   for stick 1.
+#
+# - dpad={native | xy | hat | u-<input>,d-<input>,l-<input>,r-<input>}:
+#   Specifies the configuration for the directional pad (D-pad).  "native"
+#   indicates that the device reports D-pad inputs through the D-pad input
+#   elements on the "Generic Desktop" usage page (usages 0x90 through
+#   0x93); "xy" indicates that the device reports D-pad inputs as the X and
+#   Y elements on the "Generic Desktop" usage page (usages 0x30 and 0x31,
+#   normally used for the primary analog stick); "hat" indicates that the
+#   device reports D-pad inputs as a hat with eight positions; and the last
+#   format indicates that the device reports each of the four cardinal
+#   directions on the D-pad as a separate input, and the four <inputs> are
+#   associated with up, down, left, and right respectively.  If omitted,
+#   the device will not report any D-pad events.
+#
+# - face=u-<input>,d-<input>,l-<input>,r-<input>: Specifies the inputs
+#   corresponding to the face buttons (the buttons typically operated with
+#   the thumb of the right hand, such as the A/B/X/Y buttons on a Nintendo
+#   or Microsoft controller).  The four <input>s are respectively
+#   associated with the uppermost (or "north"), lowermost ("south"),
+#   leftmost ("west"), and rightmost ("east") buttons in the four-point
+#   layout seen on many gamepad devices.  If omitted, the device will have
+#   no mapping for these buttons.
+#
+# - shoulder=l-<input>,r-<input>: Specifies the input corresponding to the
+#   left and right shoulder buttons, respectively.  If omitted, the device
+#   will have no mapping for these buttons.
+#
+# - trigger=l-<input>,r-<input>: Specifies the inputs corresponding to the
+#   left and right trigger buttons, respectively.  If omitted, the device
+#   will have no mapping for these buttons.
+#
+# - start=<input>: Specifies the input corresponding to the Start button.
+#   For gamepads, this is typically the rightmost of two or three buttons
+#   in the middle of the device, between the left stick or D-pad and the
+#   face buttons.  If omitted, the device will have no mapping for this
+#   button.
+#
+# - select=<input>: Specifies the input corresponding to the Select button.
+#   For gamepads, this is typically the leftmost of two or three buttons
+#   in the middle of the device, between the left stick or D-pad and the
+#   face buttons.  If omitted, the device will have no mapping for this
+#   button.
+#
+# - menu=<input>: Specifies the input corresponding to the Menu button.
+#   For gamepads, this is typically the central of three buttons in the
+#   middle of the device, between the left stick or D-pad and the face
+#   buttons.  If omitted, the device will have no mapping for this button.
+#
+# - linux_rumble={left_strong | right_strong}: For gamepad devices with
+#   distinct left and right force feedback motors, specifies how those
+#   motors map to the "strong" and "weak" motors used by the Linux API.
+#   "left_strong" indicates that the "strong" motor is the left motor and
+#   the "weak" motor is the right motor; "right_strong" indicates the
+#   reverse.  If omitted and the device supports force feedback, both
+#   motors will be driven at the average of the requested left and right
+#   strengths on Linux.
+#
+# For fields which take an <input> argument, <input> may be any of the
+# following:
+#    - b<N> (specifies a button, where <N> is a zero-based button index)
+#    - x, y, z, rx, ry, rz (specifies the given input on the USB "Generic
+#          Desktop" usage page)
+#
+
+###########################################################################
+###########################################################################
+
+# Microsoft Xbox 360 controller on Linux
+lstick=x-x,y-y,b-b9:rstick=x-rx,y-ry,b-b10:dpad=hat:face=u-b3,d-b0,l-b2,r-b1:shoulder=l-b4,r-b5:trigger=l-z,r-rz:start=b6:select=b7:menu=b8:linux_rumble=left_strong "Microsoft X-Box 360 pad"
+
+# Microsoft Xbox 360 controller on Windows using the rawinput interface
+# (the guide button and triggers are not exposed)
+lstick=x-x,y-y,b-b8:rstick=x-rx,y-ry,b-b9:dpad=hat:face=u-b3,d-b0,l-b2,r-b1:shoulder=l-b4,r-b5:start=b6:select=b7 "Controller (XBOX 360 For Windows)"
+
+# Sony PS3 controllers
+lstick=x-x,y-y,b-b1:rstick=x-z,y-rz,b-b2:dpad=u-b4,d-b6,l-b7,r-b5:face=u-b12,d-b14,l-b15,r-b13:shoulder=l-b10,r-b11:trigger=l-b8,r-b9:start=b3:select=b0:menu=b16:linux_rumble=right_strong "PLAYSTATION(R)3 Controller" "Sony PLAYSTATION(R)3 Controller"
+
+# Sony PS4 controllers (input mapping used by Linux 4.10 and later)
+os=LINUX:vidpid=054c,05c4:ver=8000,8000:lstick=x-x,y-y,b-b11:rstick=x-rx,y-ry,b-b12:dpad=hat:face=u-b2,d-b0,l-b3,r-b1:shoulder=l-b4,r-b5:trigger=l-b6,r-b7:start=b9:select=b8:menu=b10:linux_rumble=left_strong *
+os=LINUX:vidpid=054c,09cc:ver=8000,8000:lstick=x-x,y-y,b-b11:rstick=x-rx,y-ry,b-b12:dpad=hat:face=u-b2,d-b0,l-b3,r-b1:shoulder=l-b4,r-b5:trigger=l-b6,r-b7:start=b9:select=b8:menu=b10:linux_rumble=left_strong *
+# Sony PS4 controllers (generic)
+vidpid=054c,05c4:lstick=x-x,y-y,b-b10:rstick=x-z,y-rz,b-b11:dpad=hat:face=u-b3,d-b1,l-b0,r-b2:shoulder=l-b4,r-b5:trigger=l-b6,r-b7:start=b9:select=b8:menu=b12:linux_rumble=left_strong *
+vidpid=054c,09cc:lstick=x-x,y-y,b-b10:rstick=x-z,y-rz,b-b11:dpad=hat:face=u-b3,d-b1,l-b0,r-b2:shoulder=l-b4,r-b5:trigger=l-b6,r-b7:start=b9:select=b8:menu=b12:linux_rumble=left_strong *
+
+#-------------------------------------------------------------------------#
+
+# Devices reported by Shovel Knight users:
+# http://yachtclubgames.com/2014/03/steam-controller-support/
+# https://docs.google.com/spreadsheet/ccc?key=0Ahwb92kdrYrKdDFaUWZmTHlZTk8zSEkycDdrbk1Vc3c&usp=sharing
+# (excluding those already listed above and those which appear invalid or
+# corrupt)
+#
+# Note that these were originally SDL-format joystick strings, and the SDL
+# format doesn't include the name reported by the device (just an arbitrary
+# descriptive name for the string), so we don't attempt to match the name.
+
+# AfterglowPS3 Controller
+vidpid=1a34,0836:face=u-b3,d-b1,l-b0,r-b2:select=b8:dpad=hat:menu=b12:shoulder=l-b4,r-b5:lstick=x-x,y-y,b-b10:trigger=l-b6,r-b7:rstick=x-z,y-rx,b-b11:start=b9 *
+# GameStopGamepad
+vidpid=ffff,0000:face=u-b3,d-b0,l-b2,r-b1:select=b8:dpad=hat:shoulder=l-b4,r-b5:lstick=x-x,y-y,b-b10:trigger=l-b6,r-b7:rstick=x-z,y-rx,b-b11:start=b9 *
+# GenericDirectInput Controller
+vidpid=046d,c216:face=u-b3,d-b1,l-b0,r-b2:select=b8:dpad=hat:shoulder=l-b4,r-b5:lstick=x-x,y-y,b-b10:trigger=l-b6,r-b7:rstick=x-z,y-rx,b-b11:start=b9 *
+# LogitechF710 Gamepad
+vidpid=046d,c219:face=u-b3,d-b1,l-b0,r-b2:select=b8:dpad=hat:shoulder=l-b4,r-b5:lstick=x-x,y-y,b-b10:trigger=l-b6,r-b7:rstick=x-z,y-rx,b-b11:start=b9 *
+# PS3Controller
+vidpid=8888,0308:face=u-b3,d-b2,l-b0,r-b1:select=b8:dpad=hat:menu=b12:shoulder=l-b4,r-b5:lstick=x-x,y-y,b-b9:trigger=l-b6,r-b7:rstick=x-rx,y-ry,b-b10:start=b11 *
+# PS3DualShock
+vidpid=0925,0005:face=u-b3,d-b2,l-b0,r-b1:select=b9:dpad=hat:shoulder=l-b6,r-b7:lstick=x-x,y-y,b-b10:trigger=l-b4,r-b5:rstick=x-z,y-rx,b-b11:start=b8 *
+# BUFFALOBGC-FC801 USB Gamepad
+vidpid=0411,00c6:face=u-b3,d-b0,l-b2,r-b1:start=b7:select=b6:lstick=x-x,y-y:shoulder=l-b4,r-b5 *
+# 4axis 16 button joystick
+vidpid=6666,0667:face=u-b0,d-b2,l-b3,r-b1:start=b11:select=b8:lstick=x-x,y-y,b-b9:rstick=x-z,y-rx,b-b10:shoulder=l-b6,r-b7:dpad=u-b12,d-b14,l-b15,r-b13:trigger=l-b4,r-b5 *
+# 2Axes11Keys Game Pad
+vidpid=12bd,d015:start=b9:select=b8:lstick=x-x,y-y *
+# MLGGamepad PS3
+vidpid=0738,8263:face=u-b3,d-b1,l-b0,r-b2:start=b9:menu=b12:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# HamaScorpad
+vidpid=1a34,0203:face=u-b3,d-b1,l-b0,r-b2:start=b9:menu=b12:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# Generipad
+vidpid=0079,0006:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-ry,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# SonyDualshock 2
+vidpid=0e8f,0003:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-rx,y-z,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# LogitechRumblePad 2
+vidpid=046d,c218:face=u-b3,d-b1,l-b0,r-b2:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# SvenX-Pad
+vidpid=11ff,3331:face=u-b1,d-b2,l-b0,r-b3:start=b4:select=b5:lstick=x-x,y-y,b-b10:rstick=x-z,y-ry,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b8,r-b9 *
+# SaitekP2900
+vidpid=06a3,040c:face=u-b3,d-b1,l-b0,r-b2:start=b9:menu=b8:select=b12:lstick=x-x,y-y,b-b10:rstick=x-rx,y-z,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# FoxNew
+vidpid=0e8f,0012:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# DefenderGame Racer Turbo GT
+vidpid=0810,0003:face=u-b0,d-b2,l-b3,r-b1:menu=b8:lstick=x-x,y-y,b-b10:rstick=x-ry,y-z,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5:start=b9 *
+# MayflashArcadeStick
+vidpid=0925,2801:face=u-b3,d-b4,l-b6,r-b2:start=b8:select=b9:shoulder=l-b1,r-b5:trigger=l-b0,r-b7:lstick=x-x,y-y *
+# PS2
+vidpid=0925,8868:face=u-b0,d-b2,l-b3,r-b1:start=b8:select=b9:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b5,r-b7:dpad=hat:trigger=l-b4,r-b6 *
+# WiiClassicControllerwithUSBAdapter
+vidpid=1d79,0301:face=u-b0,d-b2,l-b3,r-b1:start=b9:menu=b10:select=b8:shoulder=l-b4,r-b5:dpad=hat:lstick=x-x,y-y:rstick=x-z,y-rx:trigger=l-b6,r-b7 *
+# 2axis8keys
+vidpid=12bd,d012:face=u-b3,d-b0,l-b2,r-b1:start=b7:select=b6:shoulder=l-b4,r-b5:lstick=x-x,y-y *
+# TwinUSBGamepad
+vidpid=0001,0810:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-rx,y-z,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# SpeedLinkStrikeFX
+vidpid=0e8f,3075:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# PS2Motioninjoy
+vidpid=8888,0408:face=u-b12,d-b14,l-b15,r-b13:start=b3:menu=b16:select=b0:lstick=x-x,y-y,b-b1:rstick=x-z,y-rx,b-b2:shoulder=l-b10,r-b11:dpad=u-b4,d-b6,l-b7,r-b5:trigger=l-b8,r-b9 *
+# WiiClassicController(MayflashAdapter)
+vidpid=0925,03e8:face=u-b3,d-b0,l-b2,r-b1:start=b9:menu=b10:select=b8:dpad=hat:lstick=x-x,y-y:rstick=x-z,y-rx:shoulder=l-b6,r-b7:trigger=l-rz,r-ry *
+# SuperNES
+vidpid=f000,00f1:face=u-b4,d-b1,l-b0,r-b5:start=b3:select=b2:shoulder=l-b6,r-b7:lstick=x-x,y-y *
+# PS2-2
+vidpid=0925,8800:face=u-b0,d-b2,l-b3,r-b1:start=b8:select=b9:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# MadcatzFightStickTE
+vidpid=0738,8838:face=u-b3,d-b1,l-b0,r-b2:start=b9:select=b8:shoulder=l-b5,r-b7:dpad=hat:trigger=l-b4,r-b6:menu=b12:lstick=x-x,y-y:rstick=x-z,y-rx *
+# iBUFFALO
+vidpid=0583,2060:face=u-b2,d-b1,l-b3,r-b0:start=b7:select=b6:shoulder=l-b4,r-b5:lstick=x-x,y-y *
+# retropadnes
+vidpid=f000,0003:face=u-b2,d-b1,l-b3,r-b0:lstick=x-x,y-y *
+# SnesMayflashAdapter
+vidpid=0e8f,3013:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:shoulder=l-b6,r-b7:lstick=x-x,y-y *
+# TTXTechUniversalWiredController
+vidpid=0e8f,310d:face=u-b3,d-b1,l-b0,r-b2:start=b9:menu=b12:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# MicrosoftSideWinderPnP
+vidpid=045e,0027:face=u-b3,d-b0,l-b2,r-b1:lstick=x-x,y-y:start=b5:select=b4 *
+# Horipad3Pro
+vidpid=0f0d,0009:face=u-b3,d-b1,l-b0,r-b2:start=b9:menu=b12:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# RetrNEScontroller
+vidpid=0f00,0001:start=b3:select=b2:lstick=x-x,y-y *
+# NES/FC/SFCJoypadToUSBBOX
+vidpid=0079,1804:face=u-b3,d-b0,l-b2,r-b1:start=b7:select=b6:shoulder=l-b4,r-b5:dpad=hat *
+# ThrustmasterFerrariWireless-Ferrari150
+vidpid=044f,d008:face=u-b3,d-b1,l-b0,r-b2:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rz,b-b11:shoulder=l-b4,r-b5:dpad=hat *
+# SaturnUSB
+vidpid=04b4,010a:face=u-b5,d-b1,l-b4,r-b2:start=b8:select=b6:lstick=x-x,y-y *
+# LeadershipGamerJoypadVibration
+vidpid=12bd,e001:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-rx,y-z,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# USBSNESCLASSICCONTROLLER
+vidpid=0079,0011:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-ry:trigger=l-b4,r-b5 *
+# SaitekP990
+vidpid=06a3,040b:face=u-b3,d-b1,l-b0,r-b2:start=b8:select=b9:lstick=x-x,y-y,b-b10:rstick=x-rx,y-z,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# LogitechWingmanRumblepad
+vidpid=046d,c20a:face=u-b4,d-b0,l-b3,r-b1:start=b8:menu=b5:select=b2:shoulder=l-b6,r-b7:dpad=hat:lstick=x-x,y-y:rstick=x-rx,y-ry *
+# SuperJoyBox3Pro
+vidpid=6666,8801:face=u-b0,d-b2,l-b3,r-b1:start=b8:select=b9:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# RetrolinkUSBSaturnPad
+vidpid=12bd,d013:shoulder=l-b5,r-b2:face=u-b4,d-b0,l-b3,r-b1:start=b8:menu=b7:select=b6:lstick=x-x,y-y *
+# Qanbaq4raf
+vidpid=0f30,1012:face=u-b3,d-b1,l-b0,r-b2:start=b9:select=b8:dpad=hat:lstick=x-y,y-x:trigger=l-b4,r-b6 *
+# SaitekP2600
+vidpid=06a3,5f0d:face=u-b3,d-b1,l-b0,r-b2:start=b10:shoulder=l-b4,r-b5:dpad=hat:lstick=x-x,y-y:rstick=x-rx,y-z:trigger=l-b6,r-b7 *
+# (S)NES/Atari_USB
+vidpid=1781,0a96:face=u-b1,d-b4,l-b5,r-b0:start=b3:select=b2:trigger=l-b6,r-b7:lstick=x-x,y-y *
+# DualShock2
+vidpid=11ff,3341:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-rx,y-z,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# ps2controlleradapter
+vidpid=0925,8866:face=u-b0,d-b2,l-b3,r-b1:start=b8:select=b9:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# FFXIV
+vidpid=2185,0102:face=u-b3,d-b1,l-b0,r-b2:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# GembirdJPD-FFB-A
+vidpid=11ff,3340:face=u-b0,d-b2,l-b3,r-b1:start=b15:menu=b12:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# ThrustmasterDualAnalog4
+vidpid=044f,b315:face=u-b3,d-b0,l-b1,r-b2:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b6:dpad=hat:trigger=l-b5,r-b7 *
+# SaitekP2500Rumble
+vidpid=06a3,ff0c:face=u-b1,d-b2,l-b0,r-b3:start=b11:select=b10:lstick=x-x,y-y,b-b8:rstick=x-z,y-rx,b-b9:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# USBPS2
+vidpid=05e3,0596:face=u-b0,d-b2,l-b3,r-b1:menu=b8:select=b9:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# PLAYSEGA
+vidpid=0e8f,0041:face=u-b2,d-b0,l-b3,r-b1:start=b8:menu=b4:select=b5:shoulder=l-b6,r-b7:lstick=x-x,y-y *
+# Macally
+vidpid=2222,0060:face=u-b3,d-b1,l-b0,r-b2:start=b9:select=b8:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:lstick=x-x,y-y,b-b10:dpad=hat:trigger=l-b6,r-b7 *
+# FirestormDigital3
+vidpid=07b5,0213:face=u-b3,d-b0,l-b1,r-b2:shoulder=l-b4,r-b6:lstick=x-x,y-y:trigger=l-b5,r-b7 *
+# T-Wireless3in1RumbleForce
+vidpid=044f,d001:face=u-b3,d-b0,l-b1,r-b2:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b6:dpad=hat:trigger=l-b5,r-b7 *
+# Run'N'Drive
+vidpid=044f,d003:face=u-b3,d-b1,l-b0,r-b2:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rz,b-b11:shoulder=l-b4,r-b5:dpad=hat *
+# TwinUSBNetworkGamepad(CaboPS2Maxprint)
+vidpid=0810,0001:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-rx,y-z,b-b11:shoulder=l-b6,r-b7:dpad=hat:trigger=l-b4,r-b5 *
+# Adaptoid
+vidpid=06f7,0001:face=u-b4,d-b0,l-b3,r-b1:start=b8:select=b2:lstick=x-x,y-y,b-b9 *
+# XeoxProanaloggamepad
+vidpid=1a34,0806:rstick=x-z,y-rx,b-b5:shoulder=l-b6,r-b7:dpad=u-b10,d-b11,l-b12,r-b13:face=u-b3,d-b0,l-b2,r-b1:start=b9:menu=b12:select=b8:lstick=x-x,y-y,b-b10:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# Sanwa16-Button(JY-P62UBK)
+vidpid=11c0,5044:face=u-b4,d-b0,l-b3,r-b1:start=b14:menu=b13:select=b12:lstick=x-x,y-y,b-b10:rstick=x-rx,y-z,b-b11:shoulder=l-b5,r-b2:trigger=l-b7,r-b9 *
+# Elecom
+vidpid=05b8,1004:start=b9:select=b8:lstick=x-x,y-y,b-b10:shoulder=l-b4,r-b5:trigger=l-b6,r-b7 *
+# GiotecksWiredPS3Controller
+vidpid=25f0,c121:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# PS360+
+vidpid=0010,0082:face=u-b3,d-b1,l-b0,r-b2:start=b9:menu=b12:select=b8:shoulder=l-b5,r-b4:dpad=hat:trigger=l-b7,r-b6:lstick=x-x,y-y:rstick=x-z,y-rx *
+# RetroUSBFamicomControllerGamepad
+vidpid=081f,e401:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:shoulder=l-b4,r-b5:lstick=x-x,y-y *
+# LogitechPrecisionGamepad
+vidpid=046d,c21a:face=u-b3,d-b1,l-b0,r-b2:start=b9:select=b8:shoulder=l-b4,r-b5:lstick=x-x,y-y:trigger=l-b6,r-b7 *
+# GenuisMaxFireBlaze
+vidpid=0583,b031:face=u-b3,d-b0,l-b2,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:trigger=l-b6,r-b7 *
+# TigerGameXbox+PS2+GCUSBAdapterDualShock
+vidpid=0926,2526:face=u-b0,d-b2,l-b3,r-b1:start=b8:select=b9:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b6,r-b7:dpad=u-b12,d-b14,l-b15,r-b13:trigger=l-b4,r-b5 *
+# PSP
+vidpid=00ff,01cb:face=u-b3,d-b0,l-b2,r-b1:start=b7:menu=b8:select=b6:shoulder=l-b4,r-b5:dpad=hat:lstick=x-x,y-y *
+# GioteckVX2WiredController
+vidpid=25f0,83c3:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-rx,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# HamauRageVendettaGamepad
+vidpid=0079,0002:face=u-b0,d-b2,l-b3,r-b1:start=b9:select=b8:lstick=x-x,y-y,b-b10:rstick=x-z,y-ry,b-b11:shoulder=l-b4,r-b5:dpad=hat:trigger=l-b6,r-b7 *
+# NES30
+vidpid=1235,ab12:face=u-b0,d-b2,l-b3,r-b1:start=b7:select=b6:dpad=xy:trigger=l-b4,r-b5 *
+
+###########################################################################
+###########################################################################

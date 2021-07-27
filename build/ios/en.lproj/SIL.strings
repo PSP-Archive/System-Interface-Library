@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IOS_ERROR_TITLE</key>
+	<string>Error</string>
+	<key>IOS_FRIENDLY_ERROR_TITLE</key>
+	<string>Sorry!</string>
+	<key>IOS_PLAYERLIST_ERROR_TEXT</key>
+	<string>The active player could not be updated due to a system error. %s will now exit.</string>
+</dict>
+</plist>

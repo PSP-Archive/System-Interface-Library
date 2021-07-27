@@ -1,0 +1,2183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Style-Type" content="text/css"/>
+<title>SIL Coding Style Guidelines</title>
+<style type="text/css">
+body {
+	font-family: verdana, sans-serif;
+}
+
+*.title {
+	font-size: 200%;
+	font-weight: bold;
+	text-align: center;
+}
+
+*.section-title {
+	font-size: 150%;
+	font-weight: bold;
+	text-align: center;
+}
+
+*.toc {
+	font-size: 100%;
+}
+
+dl.toc dt {
+	font-weight: bold;
+}
+
+*.backlink {
+	font-size: 80%;
+	text-align: right;
+}
+@media print {
+	*.backlink { display: none; }
+}
+
+sup {
+	font-size: 80%;
+	vertical-align: baseline;
+	position: relative;
+	bottom: 0.667ex;
+}
+
+*.footnote {
+	font-size: 75%;
+}
+
+hr {
+	text-align: center;
+	margin-top: 1.5ex;
+	margin-bottom: 1.5ex;
+}
+
+ul {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+tt {
+	color: #006600;
+}
+
+div.rule {
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+div.rule-title {
+	margin-top: 0.25em;
+	margin-bottom: 0.25em;
+	font-size: 120%;
+	font-weight: bold;
+}
+div.rule-summary {
+	margin-top: 1em;
+	margin-bottom: 1em;
+	margin-left: 2em;
+	font-weight: bold;
+}
+div.rule-details {
+	margin-left: 2em;
+}
+div.rule-details p {
+	margin-top: 1em;
+	margin-bottom: 0;
+}
+div.rule-details ul {
+	margin-top: 0;
+}
+
+div.code {
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+	margin-left: 2em;
+	margin-right: 2em;
+	padding: 1ex;
+	font-family: monospace;
+	white-space: pre;
+	border: 1px solid #808080;
+	background: #f8f8f8;
+}
+div.good {
+	border-color: #008000;
+	background: #f0fff0;
+	color: #006600;
+}
+div.bad {
+	border-color: #aa0000;
+	background: #fff0f0;
+	color: #990000;
+}
+span.comment {
+	font-style: italic;
+	color: #555555;
+}
+div.good span.comment {
+	color: #559955;
+}
+div.bad span.comment {
+	color: #c05555;
+}
+</style>
+</head>
+
+<body>
+<h1 class="title" id="top">SIL Coding Style Guidelines</h1>
+
+<dl class="toc">
+
+<dt>1. <a href="#section-1">Language features</a></dt>
+    <dd ><a href="#language-standard">Language standard</a>
+    <br/><a href="#type-size-assumptions">Type size assumptions</a>
+    <br/><a href="#integer-types">Integer types</a>
+    <br/><a href="#signed-vs-unsigned-integers">Signed vs. unsigned integers</a>
+    <br/><a href="#boolean-values">Boolean values</a>
+    <br/><a href="#floating-point-types">Floating-point types</a>
+    <br/><a href="#floating-point-literals">Floating-point literals</a>
+    <br/><a href="#compound-literals">Compound literals</a>
+    <br/><a href="#zero-values">Zero values</a>
+    <br/><a href="#comparing-against-zero">Comparing against zero</a>
+    <br/><a href="#failure-return-values">Failure return values</a>
+    <br/><a href="#side-effects-in-conditional-expressions">Side effects in conditional expressions</a>
+    <br/><a href="#bitwise-operators">Bitwise operators</a>
+    <br/><a href="#the-const-keyword">The <tt>const</tt> keyword</a>
+    <br/><a href="#constants">Constants</a>
+    <br/><a href="#the-goto-statement">The <tt>goto</tt> statement</a>
+    <br/><a href="#assertions">Assertions</a>
+    <br/><a href="#macros">Macros</a>
+    <br/><a href="#include-directives"><tt>#include</tt> directives</a>
+    <br/><a href="#nested-includes">Nested <tt>#include</tt>s</a>
+    <br/><a href="#structure-tags-and-typedefs">Structure tags and <tt>typedef</tt>s</a>
+    <br/><a href="#branch-hints">Branch hints</a>
+    </dd>
+
+<dt>2. <a href="#section-2">Formatting</a></dt>
+    <dd ><a href="#character-encoding">Character encoding</a>
+    <br/><a href="#line-length">Line length</a>
+    <br/><a href="#indentation">Indentation</a>
+    <br/><a href="#tabs-vs-spaces">Tabs vs. spaces</a>
+    <br/><a href="#one-statement-per-line">One statement per line</a>
+    <br/><a href="#related-subexpressions">Related subexpressions</a>
+    <br/><a href="#whitespace-around-operators">Whitespace around operators</a>
+    <br/><a href="#whitespace-in-function-and-macro-calls">Whitespace in function and macro calls</a>
+    <br/><a href="#parentheses-in-expressions">Parentheses in expressions</a>
+    <br/><a href="#parentheses-with-defined-sizeof-and-return">Parentheses with <tt>defined</tt>, <tt>sizeof</tt>, and <tt>return</tt></a>
+    <br/><a href="#conditional-and-loop-statements">Conditional and loop statements</a>
+    <br/><a href="#switch-statements"><tt>switch</tt> statements</a>
+    <br/><a href="#function-pointers">Function pointers</a>
+    <br/><a href="#function-declarations-and-definitions">Function declarations and definitions</a>
+    <br/><a href="#order-of-function-definitions">Order of function definitions</a>
+    <br/><a href="#comments">Comments</a>
+    <br/><a href="#function-headers">Function headers</a>
+    </dd>
+
+<dt>3. <a href="#section-3">Naming</a></dt>
+    <dd ><a href="#general-naming-rules">General naming rules</a>
+    <br/><a href="#function-naming-rules">Function naming rules</a>
+    <br/><a href="#filename-formatting-rules">Filename formatting rules</a>
+    <br/><a href="#identifier-formatting-rules">Identifier formatting rules</a>
+    <br/><a href="#use-of-cxx-keywords-as-c-identifiers">Use of C++ keywords as C identifiers</a>
+    </dd>
+
+<dt>4. <a href="#section-4">Other</a></dt>
+    <dd ><a href="#use-of-comments">Use of comments</a>
+    <br/><a href="#function-complexity">Function complexity</a>
+    <br/><a href="#algorithm-complexity">Algorithm complexity</a>
+    </dd>
+
+</dl>
+
+<!------------------------------------------------------------------------>
+<hr/>
+
+<p>The following guidelines were observed when writing the SIL source code.
+Note, however, that they were treated as guidelines, not rules, with the
+cardinal rule being "readability first".</p>
+
+<div class="good code"><span class="comment">/* Green boxes show examples of code that follows the style guidelines.
+ * Comments in light italics (like this one) explain details of the example
+ * and are not intended to be read as part of the example code itself. */</span>
+return 1;  // This comment is part of the example code.</div>
+<div class="bad code"><span class="comment">/* Red boxes show examples of code that violates the style guidelines. */</span>
+return(0);</div>
+
+<!------------------------------------------------------------------------>
+<hr/>
+
+<h2 class="section-title" id="section-1">1. Language features</h2>
+
+<div class="rule" id="language-standard">
+  <div class="rule-title">Language standard</div>
+  <div class="rule-summary">Use C99 (but avoid complex number types and
+    variable-length arrays) and C++11.  Anonymous unions are allowed, but
+    otherwise avoid compiler-specific features.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> All modern compilers support C99 and C++11, with
+      occasional minor exceptions that generally do not impact SIL.
+      Modern compilers also support anonymous unions; this feature is
+      nonstandard in C99, but it has been added to the C11 standard, so
+      such unions will be forward-compatible.  On the flip side, the C11
+      standard makes C99's complex number types (the <tt>&lt;complex.h&gt;</tt>
+      header) and variable-length arrays optional, so those features should
+      be avoided.</p>
+  </div>
+</div>
+
+<div class="rule" id="type-size-assumptions">
+  <div class="rule-title">Type size assumptions</div>
+  <div class="rule-summary">Assume that <tt>int</tt> is at least 32 bits
+    wide, that pointer values are at least as wide as <tt>int</tt>, and
+    that function pointer types can be safely converted to and from
+    <tt>void *</tt>.  Make no other assumptions beyond what is required by
+    the relevant language standard.</div>
+  <div class="rule-details">
+    <p><i>Rationale (<tt>int</tt>):</i> In all modern PC-class environments,
+      including devices such as tablets and game consoles which can run
+      general-purpose software, the <tt>int</tt> type is at least 32 bits
+      wide.  (There are some embedded processor environments which use
+      16-bit <tt>int</tt>s to better match the hardware's capabilities, but
+      such environments are generally not suited to running SIL-based
+      programs.)  Modern programs frequently need to work with data larger
+      than a 16-bit integer can hold; requiring all code to either check
+      for 16-bit overflow or explicitly use a 32-bit type would
+      significantly increase the risk of bugs.</p>
+    <p><i>Rationale (pointers):</i> In all modern PC-class environments,
+      pointers to both data and functions are simple scalar values of at
+      least the native word size, ensuring that an <tt>int</tt>-sized value
+      can be safely stored in and later retrieved from a pointer variable
+      and that a function pointer can be safely converted to and from a
+      void pointer.  This technique is useful in certain cases, such as
+      when passing an integer value or function pointer through an
+      interface that takes an opaque pointer argument.  While these
+      conversions should be avoided when possible, for the purposes of SIL
+      they may be considered safe.</p>
+    <p>Note that converting a pointer to <tt>int</tt> and back is
+      <i>not</i> safe! On systems with 64-bit pointers but 32-bit
+      <tt>int</tt>, the upper 32 bits of the pointer would be lost in such
+      a conversion.</p>
+  </div>
+</div>
+
+<div class="rule" id="integer-types">
+  <div class="rule-title">Integer types</div>
+  <div class="rule-summary">Use <tt>int</tt> by default, sized types when
+    appropriate.  Use <tt>int8_t</tt> instead of <tt>char</tt> for
+    numeric data.  Avoid <tt>long</tt> and <tt>short</tt> except where
+    required.</div>
+  <div class="rule-details">
+    <p><i>Rationale (<tt>int</tt>):</i> We assume that the <tt>int</tt> type
+      is at least 32 bits wide (see <a href="#type-size-assumptions">type
+      size assumptions</a> above), so there is no need to use <tt>long</tt>
+      or <tt>int32_t</tt> merely to ensure a 32-bit data type.  Using
+      <tt>int</tt> as widely as possible reduces the chance of accidental
+      truncation due to conversion between types of different sizes.</p>
+    <p><i>Rationale (sized types):</i> Since we assume <tt>int</tt> is at
+      least 32 bits wide, there should rarely be a need to specify sized
+      types for local variables.  However, sized types can be useful in
+      certain cases, such as:</p>
+    <ul>
+      <li><tt>int64_t</tt> for values that may grow larger than 32 bits
+        (prefer this to <tt>long long</tt> since the latter may be a 128-bit
+        type in 64-bit environments and thus less efficient&mdash;though
+        <tt>long long</tt> may be useful if the value is to be used in a
+        formatted string);</li>
+      <li>when the size of the data is known ahead of time (such as a
+        16-bit pixel value);</li>
+      <li>to reduce the memory footprint of structured data (for a specific
+        example, see <a href="#boolean-values">boolean values</a> below);
+        or</li>
+      <li>to map a structure to an external byte stream (such as a file).</li>
+    </ul>
+    <p><i>Rationale (<tt>char</tt>):</i> While <tt>char</tt> and
+      <tt>int8_t</tt> are normally the same internal type, <tt>char</tt>
+      should be limited to data which is actually textual in nature.  For
+      8-bit numeric data, use <tt>int8_t</tt> (or <tt>uint8_t</tt>, but see
+      <a href="#signed-vs-unsigned-integers">signed vs. unsigned integers</a>
+      below) to indicate to the reader that the data is numeric.  Note in
+      particular that whether <tt>char</tt> is signed or unsigned depends
+      on the compiler, so using <tt>char</tt> for a signed 8-bit integer
+      can result in nasty surprises.  (For this reason, <tt>char</tt>
+      variables should only be compared against other data of <tt>char</tt>
+      type such as character literals, not against integer values.)</p>
+    <p><i>Rationale (<tt>long</tt> and <tt>short</tt>):</i> Sized integer
+      types make <tt>long</tt> and <tt>short</tt> generally unnecessary,
+      but when calling library functions with <tt>long</tt>- or
+      <tt>short</tt>-type parameters or return values, it can be more
+      convenient to use those types directly instead of casting back and
+      forth.  However, try not to propagate such types outside the
+      immediate locality of the library call.</p>
+  </div>
+</div>
+
+<div class="rule" id="signed-vs-unsigned-integers">
+  <div class="rule-title">Signed vs. unsigned integers</div>
+  <div class="rule-summary">Use signed types unless there's a good reason
+    to use unsigned types.  Don't use unsigned types just because you never
+    expect to have a negative value.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Conversions between signed and unsigned integer
+      types are a perennial source of bugs, so much so that most modern
+      compilers warn about mixing them.  The easiest way to avoid these
+      bugs is to not use unsigned types at all.  In particular, "this value
+      will never be negative" is not a reason to use an unsigned type;
+      someday the value <i>will</i> go negative, and your code will break.</p>
+    <p>There are still a few cases in which unsigned types are beneficial:</p>
+    <ul>
+      <li><i>Library functions:</i> Many of the standard C library
+        functions take unsigned parameters or return unsigned results
+        (<tt>size_t</tt> is a major offender here).  However, try not to
+        propagate the unsigned type outside the immediate locality of the
+        library call.</li>
+      <li><i>Data requiring the full unsigned range:</i> Pixel data is a
+        common example of this; a pointer to 8-bit-per-component RGBA pixel
+        data must be <tt>uint8_t</tt>, not <tt>int8_t</tt>, since 8-bit
+        color component values range from 0 through 255.  (However, you can
+        and should use signed <tt>int</tt> rather than <tt>uint8_t</tt> for
+        local variables holding such values.)</li>
+      <li><i>Bitfields:</i> Integers used as bitfields (such as for flags)
+        should usually be unsigned, so that masking and shifting right the
+        highest bit does not result in a negative value.  But consider
+        breaking out the flags or fields into separate variables if memory
+        size is not an important consideration.</li>
+      <li><i>Wraparound behavior:</i> If a variable's value is expected to
+        wrap around from its maximum to its minimum or vice versa, unsigned
+        variables may be a better choice because the C language guarantees
+        wraparound behavior for unsigned integer types but not for signed
+        ones, so less effort is needed to portably ensure correct behavior.
+        However, additional care may be needed when taking differences of
+        two such values, since the C language does not specify the behavior
+        of storing a large unsigned value into a signed variable (thus, for
+        example, <tt>(int)~0U&nbsp;==&nbsp;-1</tt> is not guaranteed to
+        hold on all systems).</li>
+      <li><i>Optimization:</i> In some cases, it takes fewer CPU
+        instructions or cycles to operate on unsigned values than on signed
+        values.  However, make sure the benefit is worth it before taking
+        this step (remember that <a href="#algorithm-complexity">premature
+        optimization is the root of all evil</a>).</li>
+    </ul>
+  </div>
+</div>
+
+<div class="rule" id="boolean-values">
+  <div class="rule-title">Boolean values</div>
+  <div class="rule-summary">Use the <tt>uint8_t</tt> type for data stored
+    in memory, <tt>int</tt> otherwise.  Never assign a value other than 0
+    or 1 to a boolean variable.</div>
+  <div class="rule-details">
+    <p><i>Rationale (data types):</i> Experience has shown that boolean
+      flags are used sufficiently often to warrant the use of a smaller
+      data type than <tt>int</tt> when such values are stored in memory.
+      On the other hand, values typically stored in registers, such as
+      function parameters and return values or local variables, do not
+      benefit from using a smaller-sized type.  Note that C99 provides the
+      <tt>_Bool</tt> type, along with the <tt>&lt;stdbool.h&gt;</tt> header
+      which defines it as <tt>bool</tt>, but this type is not guaranteed to
+      be link-compatible with the C++ <tt>bool</tt> type, so it is unsuitable
+      for use in a library such as SIL which may be linked with C++ code.</p>
+    <p><i>Rationale (assignment of values):</i> While C treats any nonzero
+      value as true, assigning an arbitrary value directly to a boolean
+      variable can have unexpected results: for example, on a system where
+      <tt>long</tt> is larger than <tt>int</tt>, the value <tt>LONG_MIN</tt>
+      itself is nonzero and therefore true, but assigning it directly to a
+      boolean variable (of type <tt>int</tt> or <tt>uint8_t</tt>) will
+      result in a false value due to truncation.  It is permissible to copy
+      the value of one boolean variable to another if the first variable's
+      value is known to be safe (either 0 or 1), but do not assume that
+      boolean arguments passed to an interface function have safe values.</p>
+  </div>
+</div>
+
+<div class="rule" id="floating-point-types">
+  <div class="rule-title">Floating-point types</div>
+  <div class="rule-summary">Use <tt>float</tt> by default, <tt>double</tt>
+    only when necessary.  Avoid <tt>long double</tt> entirely.</div>
+  <div class="rule-details">
+    <p><i>Rationale (<tt>float</tt>):</i> Computations using
+      <tt>double</tt> values are generally more expensive than computations
+      with <tt>float</tt> values even on systems with hardware support for
+      double-precision floating point.  Some older systems implement
+      double-precision operations in software, in which case the difference
+      in execution time can reach an order of magnitude or more and
+      significantly impact overall program performance as well as code
+      size.  For the vast majority of floating-point computations typically
+      performed by SIL-based programs, <tt>float</tt> provides sufficient
+      precision to ensure correct behavior.  Additionally, the consistent
+      use of a single type helps avoid unexpected behavior that can result
+      from mixing precisions, such as loss of precision when a
+      <tt>double</tt> value is passed through a function which takes a
+      <tt>float</tt> parameter.</p>
+    <p><i>Rationale (<tt>long double</tt>):</i> Everything above regarding
+      the disadvantages of <tt>double</tt> applies even more strongly to
+      <tt>long double</tt>.  The range and precision of <tt>double</tt> are
+      great enough that its use should not introduce any user-visible
+      artifacts; <tt>long double</tt> is generally suited only to
+      scientific applications, and an argument could even be made that if
+      the precision of <tt>double</tt> is insufficient for a given
+      application, then the floating-point model itself is inappropriate
+      and the application should use an alternate representation for its
+      numeric values.</p>
+    <p>An example of appropriate usage of <tt>double</tt> is in the SIL
+      interface <tt>time_now()</tt>, which returns a double-precision
+      timestamp in units of seconds.  If a <tt>float</tt> value was
+      returned, it would quickly lose precision to the point of preventing
+      accurate sub-second timing.  For example, using an IEEE 754-compliant
+      single-precision type, the timestamp resolution would drop to around
+      1 millisecond after 8192 seconds (about 2&frac14; hours); at a frame
+      rate of 60 frames per second, this is more than 5% of a frame, and
+      attempting to use such a low-resolution timestamp for accurate timing
+      could result in noticeable jitter.  <tt>double</tt>, on the other
+      hand, provides nanosecond or better resolution over a time span of
+      8,388,608 seconds (more than 3 months).</p>
+  </div>
+</div>
+
+<div class="rule" id="floating-point-literals">
+  <div class="rule-title">Floating-point literals</div>
+  <div class="rule-summary">Append an <tt>f</tt> suffix to floating-point
+    literals to mark them as single precision.  Integer literals may be
+    used for integral values in floating-point expressions.</div>
+  <div class="rule-details">
+    <p><i>Rationale (<tt>f</tt> suffix):</i> It can be easy to forget that
+      floating-point literals are double precision by default, but including
+      a double-precision literal in an expression causes all other operands
+      in the expression to be promoted from single to double precision,
+      even if the expression's value is then assigned to a single-precision
+      variable (in which case the value must then be converted again, from
+      double to single precision).  Always include the <tt>f</tt> suffix on
+      floating-point literals to mark them as single precision, except when
+      the literal is intended to be a double-precision value or is used in
+      a double-precision expression.</p>
+    <p><i>Rationale (integer literals):</i> Unlike double-precision
+      literals, integer literals do not cause promotion of floating-point
+      operands, so they are generally safe to use in floating-point
+      expressions, and expressions may be easier to read without
+      extraneous ".0"s on such values.  However, bear in mind that if both
+      operands to an operator are integers, the operation will be performed
+      as an integer and may consequently overflow; values which have the
+      potential to cause such overflow should be written as floating-point
+      literals, including the <tt>f</tt> suffix when appropriate.</p>
+    <p><i>Exception:</i> It is not necessary (though also not prohibited)
+      to include the <tt>f</tt> suffix on floating-point literals used in
+      initializers, constant expressions, or function arguments, since such
+      values will be converted to single precision at compile time and thus
+      will have no impact on runtime performance.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">float rounded_value = floorf(value + 0.5f);
+
+<span class="comment">/* "3600.0f" is acceptable, but unnecessary if hours is known to be small. */</span>
+float hours_to_sec(int hours) {return hours * 3600;}
+
+<span class="comment">/* Floating-point literal since "1000000000" would cause integer overflow
+ * for sec > 2. */</span>
+float sec_to_nsec(int sec) {return sec * 1.0e9f;}
+
+<span class="comment">/* This function returns a double, so the "f" suffix is not needed (and
+ * would in fact cause an unnecessary conversion from float to double). */</span>
+double sec_to_nsec_2(int sec) {return sec * 1.0e9;}
+
+<span class="comment">/* This function returns a float, but the input variable is a double, so
+ * the literal is written as a double-precision value to match. */</span>
+float nsec_to_sec(double nsec) {return nsec / 1.0e9;}
+
+<span class="comment">/* This version performs the division in single precision.  Note the explicit
+ * "(float)" to indicate that single-precision arithmetic was intended. */</span>
+float nsec_to_sec_2(double nsec) {return (float)nsec / 1.0e9f;}
+
+float blink_interval = 1.25;  <span class="comment">// "f" suffix not needed on initializers.</span>
+
+<span class="comment">/* In tests, the "f" suffix may be necessary to ensure that a constant
+ * expression is not computed (by the compiler) in more precision than
+ * appropriate.  Leaving the literals below as double precision would cause
+ * expected_value to differ in the least significant bit from the value
+ * computed by the function call. */</span>
+float f(float x, float y) {return (x/1000.0f) * (y/1000.0f);}
+float expected_value = 0.567f * 0.789f;  <span class="comment">// Not "0.567 * 0.789".</span>
+ASSERT(f(567, 789) == expected_value);</div>
+
+<div class="bad code"><span class="comment">/* These unnecessarily convert from single to double precision and back to
+ * single precision again. */</span>
+float rounded_value = floorf(value + 0.5);
+float hours_to_sec(float hours) {return hours * 3600.0;}
+
+<span class="comment">/* Literals in compound assignment operations are treated as operands to
+ * the corresponding arithmetic operations, so they must be explicitly
+ * single-precision when appropriate.  This example unnecessarily performs
+ * the multiplication in double precision. */</span>
+float x = get_value();
+x *= 1.1;</div>
+  </div>
+</div>
+
+<div class="rule" id="compound-literals">
+  <div class="rule-title">Compound literals</div>
+  <div class="rule-summary">Use for constant arguments or by-reference
+    parameters.  Parentheses are not required, but beware of interaction
+    with macros.</div>
+  <div class="rule-details">
+    <p><i>Rationale (use):</i> C99-style compound literals can be
+      convenient to avoid the extra verbosity of declaring a variable whose
+      only purpose is as an argument to a function; this usage parallels
+      the use of a constructor return value as a function argument in C++.
+      Single-element array literals can also be convenient when a function
+      takes a numeric argument by reference instead of by value.</p>
+    <p><i>Rationale (parentheses):</i> Compound literals already require a
+      pair of parentheses and a pair of braces; adding a second enclosing
+      set of parentheses can contribute to "bracket overload" and thus
+      reduce readability.  However, keep in mind that without parentheses,
+      a compound literal will be broken into multiple macro arguments at
+      the commas.  You <a href="#macros">shouldn't be using macros anyway</a>,
+      but if you do need to pass a compound literal to a macro, remember to
+      enclose it in parentheses.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">graphics_set_fixed_color(&(Vector4f){1.0, 1.0, 1.0, 0.5});
+
+<span class="comment">/* Generally acceptable if the structure is only used once, but take care
+ * in particular that the added indentation does not lead to excessive use
+ * of vertical space. */</span>
+some_function(handle, index,
+              &(const OperationData){.operation = SOME_OPERATION,
+                                     .flags = 0,
+                                     <span class="comment">/* ... */</span>});
+
+<span class="comment">/* Here, we imagine a get_object_data() function which accepts a buffer
+ * size by reference and returns the actual amount of data written in the
+ * same parameter.  If the buffer is known to be the proper size, it can
+ * be more concise to pass the size as a literal single-element array of
+ * the proper type instead of declaring a separate variable just to provide
+ * a location for the (unused) return value. */</span>
+ObjectData data;
+get_object_data(object, &amp;data, (int[]){sizeof(data)});
+
+<span class="comment">/* An array compound literal can also be useful to discard a value returned
+ * by reference from a function which does not allow a NULL argument for
+ * the return pointer.  In this case, be aware of an oversight in the C99
+ * specification which requires at least one initializer in the literal
+ * array; writing "(ErrorCode[1]){}" in this example would cause some
+ * compilers to report errors. */</span>
+ASSERT(store_object(object, (ErrorCode[]){0}));</div>
+    <div class="bad code"><span class="comment">/* Avoid adding extra parentheses around the literal. */</span>
+graphics_set_fixed_color(&((Vector4f){1.0, 1.0, 1.0, 0.5}));
+
+<span class="comment">/* If a complex structure is used more than once, make it a variable. */</span>
+some_function(handle, index1,
+              &(const OperationData){.operation = SOME_OPERATION,
+                                     .flags = 0,
+                                     <span class="comment">/* ... */</span>});
+some_function(handle, index2,
+              &(const OperationData){.operation = SOME_OPERATION,
+                                     .flags = 0,
+                                     <span class="comment">/* ... */</span>});
+
+<span class="comment">/* If the added indentation results in excessive wrapping, use a variable
+ * instead.  (In this particular case, vec4_add() and vec4_scale() would
+ * be an even better choice.) */</span>
+graphics_set_fixed_color(&(Vector4f){.x = (first_color.x + second_color.x)
+                                          * 0.5f,
+                                     .y = (first_color.y + second_color.y)
+                                          * 0.5f,
+                                     .z = (first_color.z + second_color.z)
+                                          * 0.5f,
+                                     .w = (first_color.w + second_color.w)
+                                          * 0.5f});</div>
+  </div>
+</div>
+
+<div class="rule" id="zero-values">
+  <div class="rule-title">Zero values</div>
+  <div class="rule-summary">Use <tt>NULL</tt> for pointers, <tt>'\0'</tt>
+    for characters.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> While <tt>0</tt> represents a zero value in any
+      type, use of the most appropriate literal (<tt>NULL</tt> for
+      pointers, <tt>'\0'</tt> for characters) helps remind the reader of
+      the data type.  However, it is not necessary to write <tt>0.0</tt>
+      or <tt>0.0f</tt> for floating-point values (see also
+      <a href="#floating-point-literals">floating-point literals</a>
+      above).</p>
+  </div>
+</div>
+
+<div class="rule" id="comparing-against-zero">
+  <div class="rule-title">Comparing against zero</div>
+  <div class="rule-summary">In a conditional, omit the comparison if the
+    intent of the expression is clear; otherwise, explicitly compare
+    against a <a href="#zero-values">zero value</a>.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Conditional expressions in <tt>if</tt>,
+      <tt>for</tt>, and <tt>while</tt> statements (as well as
+      subexpressions of the logical operators <tt>&amp;&amp;</tt> and
+      <tt>||</tt>) treat any nonzero value as true, so there is no need to
+      explicitly write "<tt><i>expression</i> != 0</tt>", and it can often
+      be more readable to omit the comparison against zero.  For example,
+      when a zero value or null pointer indicates the absence of an object,
+      it is generally clearer to write <tt>"if (object)"</tt> (which can be
+      read "if <tt>object</tt> exists") than to explicitly compare against
+      zero, which can suggest that zero has some special meaning.</p>
+    <p>Use an explicit zero if the value zero has a specific meaning, such
+      as the first entry in a zero-indexed list.  Also use an explicit zero
+      when testing the return value of a comparison function like
+      <tt>strcmp()</tt> or <tt>memcmp()</tt> which returns a positive,
+      zero, or negative value to indicate the result of the comparison; an
+      expression like <tt>if (strcmp(...))</tt> tempts the reader to think
+      that the test passes if the strings are equal, when in fact it
+      <i>fails</i> for equal strings.  (This can be considered another
+      example of "the value zero has a specific meaning".  See also
+      <a href="#failure-return-values">failure return values</a> below.)</p>
+    <p>If you need to store a flag for whether a value is zero, you can use
+      the logical negation operator "<tt>!</tt>".  However, <i>do not</i>
+      use a double negation to test for a nonzero value; explicitly
+      compare against zero instead.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">for (object = list; object; object = object->next) {
+    <span class="comment">// ...</span>
+}
+
+if (user_input == 0) {   <span class="comment">// 0 is a meaningful value here.</span>
+    run_menu_0();
+}
+
+if (strcmp(input, correct_answer) == 0) {
+    user_wins();
+}
+
+alloc_failed = !buffer;  <span class="comment">// Or "alloc_failed = (buffer == 0)".</span></div>
+<div class="bad code">if (strcmp(input, correct_answer)) {
+    user_loses();  <span class="comment">// Huh?  The user loses if they give the right answer?</span>
+}
+
+have_buffer = !!buffer;  <span class="comment">// Use "have_buffer = (buffer != 0)" instead.</span></div>
+  </div>
+</div>
+
+<div class="rule" id="failure-return-values">
+  <div class="rule-title">Failure return values</div>
+  <div class="rule-summary">For functions which can fail, use a
+    <a href="#zero-values">zero value</a> to indicate failure.</div>
+  <div class="rule-details">
+    <p>Note that this differs from some common APIs, including POSIX and
+      some standard C library functions, which use zero to indicate success
+      and -1 to indicate failure.</p>
+    <p><i>Rationale:</i> When following the rules for
+      <a href="#comparing-against-zero">comparing against zero</a>, it is
+      semantically clearer for a true value to indicate success and a false
+      value to indicate failure.</p>
+    <p><i>Exception:</i> If zero is within the range of legitimate results
+      for the function, such as for a function which returns an array
+      index, use -1 to indicate failure.  But if -1 is also a legitimate
+      result, use a return (pointer) parameter to store the result and
+      return only the success/failure status as the function's return
+      value (using zero to indicate failure).</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">if (!sound_play(<span class="comment">/* ... */</span>)) {
+    display_error("Failed to play sound");
+}</div>
+    <div class="bad code">int do_something(void) {
+    <span class="comment">// ...</span>
+    return success ? 0 : -1;
+}
+
+<span class="comment">/* Given the above function definition, a reader skimming the code who was
+ * not familiar with the function might think the test below was inverted
+ * and might even insert a "!", breaking the logic. */</span>
+if (do_something()) {
+    display_error("Failed to do something");
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="side-effects-in-conditional-expressions">
+  <div class="rule-title">Side effects in conditional expressions</div>
+  <div class="rule-summary">Assignment allowed when the intent is clear,
+    but always use an explicit comparison.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> It can be convenient to use an assignment in the
+      conditional expression of a control statement, to assign a value and
+      test that value at the same time.  However, this can also make it
+      harder to follow the flow of the code, so assignments should only be
+      used when that assignment is the primary purpose of the entire
+      expression.  Also, a lone assignment expression in a conditional
+      statement can look like a mistyped equality comparison (and indeed,
+      many compilers will emit a warning along those lines), so always
+      enclose the assignment in parentheses and explicitly compare for
+      inequality to zero.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">if ((value = strtol(s, NULL, 10)) &lt; 0) {
+    <span class="comment">// ...</span>
+}
+
+if (!(buffer = mem_alloc(size, 0, 0))) {
+    return ERROR_OUT_OF_MEMORY;
+}
+
+while ((s = strtok(NULL, " ")) != NULL) {  <span class="comment">// Explicit comparison against zero.</span>
+    <span class="comment">// ...</span>
+}</div>
+    <div class="bad code">while ((ptr = get_next_object())) {  <span class="comment">// Doubly-parenthesized expression is hard to read.</span>
+    <span class="comment">// ...</span>
+}
+
+if ((slash = strchr(s, '/')) &lt; (dot = strchr(s, '.'))) {  <span class="comment">// Pull the assignments out.</span>
+    <span class="comment">// ...</span>
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="bitwise-operators">
+  <div class="rule-title">Bitwise operators</div>
+  <div class="rule-summary">Don't use the bitwise operators (<tt>&lt;&lt;
+    &gt;&gt; &amp; | ~</tt>) to perform arithmetic.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> In the past, a common C idiom was to replace
+      certain arithmetic operations with bitwise operations, such as
+      replacing multiplication by a power of two with the equivalent
+      left-shift operation, on the (generally correct) theory that bitwise
+      operations execute more quickly than arithmetic ones.  Modern
+      compilers are perfectly capable of performing this optimization
+      themselves, so there is almost never any need to resort to this
+      hack.  (This can also lead to subtle bugs due to
+      <a href="#parentheses-in-expressions">precedence errors</a>.)</p>
+    <p>In the specific case of signed division, using a right shift instead
+      of an arithmetic division will actually change the behavior of the
+      program, since right-shifting a negative value on a system using
+      two's-complement integer representation will round the value away
+      from zero, while division is defined to round the value toward zero.
+      (Note that the C99 standard declares the result of right-shifting a
+      negative value to be implementation-defined, so it is unwise to rely
+      that behavior even if it were desired.)</p>
+    <p><i>Exceptions:</i> Bitwise shifts are allowed if you only have the
+      shift count to work with, as in the "num_sectors" example below.
+      Bitwise operators may also be used if they provide a significant
+      performance benefit, such as in a tight loop where the compiler fails
+      to optimize an arithmetic operation; but even in cases where the use
+      of bitwise operators can make a difference, don't use them unless
+      you've profiled the code and you're certain that the arithmetic
+      operator is a significant bottleneck.  Remember that
+      <a href="#algorithm-complexity">premature optimization is the root of
+      all evil</a>.</p>
+    <p>In some cases, it may not be clear whether an operation is
+      semantically arithmetic or logical.  For example, computing the
+      page number from a memory address could be interpreted as either
+      arithmetically dividing by the page size or logically extracting
+      the bits containing the page number.  Use your best judgment in such
+      cases, but don't stretch for a logical-operation interpretation just
+      to make an excuse to use bitwise operators.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">x /= 2;  <span class="comment">// Not "x &gt;&gt;= 1"!</span>
+y %= 8;  <span class="comment">// Not "y &amp;= 7"!</span>
+
+<span class="comment">/* Permissible if you don't have sector_size. */</span>
+num_sectors = size &gt;&gt; log2_sector_size;
+
+<span class="comment">/* Bitwise operators are fine for bitwise operations like field extraction. */</span>
+green = (pixel >> 8) & 0xFF;</div>
+    <div class="bad code">line_offset &amp;= (display_stride - 1);  <span class="comment">// Don't do this unless you absolutely have to.</span></div>
+  </div>
+</div>
+
+<div class="rule" id="the-const-keyword">
+  <div class="rule-title">The <tt>const</tt> keyword</div>
+  <div class="rule-summary">Use <tt>const</tt> freely when appropriate.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> <tt>const</tt> can help prevent errors resulting
+      from accidentally assigning to the wrong variable; as a bonus, it
+      generally helps the compiler optimize better.  Use it whenever you
+      initialize a variable that won't be changed, such as when saving the
+      result of a function call.</p>
+    <p><tt>const</tt> can be applied at all pointer levels of a pointer
+      variable, but often one <tt>const</tt> is good enough.  (Also note
+      that some library functions expect <tt>const</tt> at some levels
+      but not at others, and for multi-level pointers, the
+      <tt>const</tt>ness of each level has to match.)</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">const int texture = texture_create(...);
+
+<span class="comment">/* "const char *str" would be fine too; that formulation would allow the
+ * (pointer) value of str itself to be modified, but typically the greater
+ * concern with string variables is that the content of the string is not
+ * changed, which "const char *" ensures.  Note that most modern compilers
+ * will emit a warning if you attempt to assign a string literal to a
+ * (non-const) "char *" variable, and also place string literal data in a
+ * read-only data section which will cause the program to abort if it
+ * attempts to modify that data. */</span>
+const char * const str = "foo";
+
+int is_number(const char *s)
+{
+    const char *end;
+    <span class="comment">/* strtol() requires a non-const "char **" as the second parameter.
+     * Rather than declaring the variable as "char *" even though we won't
+     * write through it, we declare it as "const char *" and cast away the
+     * const just for this call. */</span>
+    (void) strtol(s, (char **)&amp;end, 0);
+    return *s != '\0' &amp;&amp; *end == '\0';
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="constants">
+  <div class="rule-title">Constants</div>
+  <div class="rule-summary">Use <tt>#define</tt> or <tt>enum</tt> for
+    file-scope scalar constants, <tt>const</tt> for local scalar constants,
+    and <tt>static const</tt> for array or structured constants.  Don't
+    forget to <tt>const</tt> both levels of a string array.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> In C, file-scope constants are not folded, so
+      defining such a constant in a header using <tt>static const</tt>
+      would emit a copy of the constant in every object file including the
+      header, needlessly wasting space.  Scalar constants should therefore
+      be defined using either <tt>#define</tt> (but <a href="#macros">be
+      careful when using macros</a>) or <tt>enum</tt>; the advantage of
+      <tt>enum</tt> is that the symbol is included in debug information
+      and can be referenced in a debugger, while the disadvantages are that
+      the syntax is slightly more obtuse and that floating-point values
+      can't be used.  Constants local to a function, on the other hand, can
+      usually be compiled directly into the instruction stream as a
+      register load, so there is no problem with just using <tt>const</tt>.
+      (In this case, <tt>static</tt> is unnecessary and could potentially
+      waste space in the object file.)</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">#define MAX_ENTRIES  100  <span class="comment">// Or "enum {MAX_ENTRIES = 100};".</span>
+
+enum {STATUS_GOOD = 1, STATUS_BAD, STATUS_UGLY};
+
+<span class="comment">/* Note the double "const" here; the first "const" declares the string data
+ * to be immutable, while the second "const" declares the array itself to
+ * be immutable.  Both are required to make the data truly constant. */</span>
+static const char * const usage_text[] = {
+    "Usage: mytool [OPTION]...",
+    "Options:",
+    <span class="comment">// ...</span>
+};
+
+int myfunc(int x)
+{
+    const int maxval = 30;
+    static const int primes[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29};
+    <span class="comment">// ...</span>
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="the-goto-statement">
+  <div class="rule-title">The <tt>goto</tt> statement</div>
+  <div class="rule-summary">Use the <tt>goto</tt> statement when it will
+    avoid repetition of error-handling code.  Never use <tt>goto</tt> for
+    any other purpose.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Although "considered harmful" by some&mdash;and
+      indeed, injudicious use of <tt>goto</tt> can greatly impair code
+      maintainability&mdash;the <tt>goto</tt> statement is useful in
+      consolidating error-handling logic in a single location, and it
+      should be used in preference to repeating the same cleanup code over
+      and over.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">Object *create_object(void)
+{
+    Object *object;
+    if (!(object = malloc(sizeof(*object)))) {
+        goto error_return;
+    }
+    if (!init_object(object)) {
+        goto error_free_object;
+    }
+    if (!register_object(object)) {
+        goto error_deinit_object;
+    }
+    return object;
+
+  error_deinit_object:
+    deinit_object(object);
+  error_free_object:
+    free(object);
+  error_return:
+    return NULL;
+}</div>
+    <div class="bad code">Object *create_object(void)
+{
+    Object *object;
+    if (!(object = malloc(sizeof(*object)))) {
+        return NULL;  <span class="comment">// This is okay...</span>
+    }
+    if (!init_object(object)) {
+        free(object);
+        return NULL;  <span class="comment">// ... but now we're starting to repeat ourselves.</span>
+    }
+    if (!register_object(object)) {
+        deinit_object(object);
+        <span class="comment">/* Oops, forgot to add the free(object) call! */</span>
+        return NULL;
+    }
+    return object;
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="assertions">
+  <div class="rule-title">Assertions</div>
+  <div class="rule-summary">Assert early and often, but only for impossible
+    conditions.  Prefer static assertions to runtime assertions.  Include
+    fallback actions for runtime assertion failure where feasible, but
+    avoid complex fallback actions.</div>
+  <div class="rule-details">
+    <p>SIL provides (in <tt>base.h</tt>) three macros which can be used for
+      checking assertions: <tt>ASSERT()</tt>, <tt>PRECOND()</tt>, and
+      <tt>STATIC_ASSERT()</tt>.  At present, the first two macros are
+      essentially identical, but <tt>PRECOND()</tt> is intended for
+      checking function preconditions, and further use of the macro may be
+      made for that purpose in the future, so prefer <tt>PRECOND()</tt>
+      over <tt>ASSERT()</tt> when checking a function argument against a
+      precondition; use <tt>ASSERT()</tt> for all other cases.
+      <tt>STATIC_ASSERT()</tt> is for the specific case of assertions which
+      can be evaluated at compile time, such as checking the size of a
+      structure against an expected value.</p>
+    <p><i>Rationale (assert early and often):</i> Programmers are only
+      human, and errors will creep into any nontrivial code.  Assertions
+      provide a way to check for errors at compile time or runtime before
+      those errors cause crashes, data corruption, or other serious
+      problems.</p>
+    <p><i>Rationale (only impossible conditions):</i> By writing an
+      assertion, you are declaring (asserting) that the asserted expression
+      must be true under every possible condition.  If there is any
+      possible condition under which the expression might be false, <i>no
+      matter how unlikely,</i> do not use an assertion.  For example, never
+      assert that a memory allocation has succeeded, because there's always
+      the possibility that the program will run out of memory (or address
+      space) and the allocation will fail.  In such cases, always implement
+      and test proper error handling.</p>
+    <p><i>Exceptions (only impossible conditions):</i> You do not need to
+      consider hardware errors such as memory or register corruption when
+      deciding whether a condition is possible; for example, if an
+      interface function checks the value of an argument, its helper
+      functions do not also need to make the same check.  You may also
+      assume that system calls and other external functions behave
+      according to their documentation&mdash;you may still need to work
+      around bugs in such functions, but you don't need to assume the
+      presence of such bugs until they make themselves known.  (Conversely,
+      don't omit a check for a documented failure condition just because
+      the current implementation of the function doesn't generate that
+      condition; or if you do omit it because handling the failure would be
+      complex and difficult to test, make sure to clearly document that
+      fact.)</p>
+    <p><i>Rationale (prefer static assertions):</i> Static assertions are
+      checked during the build process and will cause compilation to fail
+      if the assertion does not hold.  Since these do not rely on executing
+      a specific code path to test the assertion, you should always use
+      them when possible.</p>
+    <p><i>Rationale (include fallback actions):</i> The <tt>ASSERT()</tt>
+      and <tt>PRECOND()</tt> macros accept an optional fallback action,
+      which is a statement (or multiple statements) that will be executed
+      if the assertion fails and the program is not running in debug mode.
+      While there is a school of thought which argues that the program
+      should always abort on assertion failure because the internal state
+      has left the designed bounds and further behavior cannot be
+      predicted&mdash;and indeed, hard failure can be more appropriate
+      than graceful fallback in security-critical situations&mdash;it is
+      often feasible to perform some sort of recovery short of terminating
+      the entire program.  For example, if a function which expects a valid
+      file handle receives a null pointer, the function can simply return
+      an error state as it would for an actual error with a valid file
+      handle.  This may result in the program terminating itself with an
+      error message, but even that is more user-friendly than simply
+      crashing.  (<tt>STATIC_ASSERT()</tt> does not include a fallback
+      action parameter because the assertion is checked at compile time,
+      so no fallback is necessary.  Instead, the macro's second argument is
+      an error message which will be displayed if the compiler supports
+      C11-style static assertions, and which serves as documentation of the
+      assertion in any case.)</p>
+    <p><i>Rationale (avoid complex fallback actions):</i> By their very
+      nature, fallback actions for assertions cannot be tested like other
+      code, since (assuming the program does not have any relevant bugs)
+      the asserted condition will never fail, and if it did, the test
+      (which runs in debug mode) would terminate anyway.  For this reason,
+      fallback actions should be extremely simple; often, a single
+      <tt>return</tt> statement is sufficient.  In cases where there is
+      no simple way to recover from an assertion failure, prefer to omit
+      the fallback action entirely, especially if there are no serious
+      consequences from the failure.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">Object *create_object(void)
+{
+    Object *object = mem_alloc(sizeof(*object), 0, 0);
+    if (!object) {
+        return NULL;  <span class="comment">// There would also be a test case for this failure.</span>
+    }
+    init_object(object);
+    ASSERT(object-&gt;state == NEW,
+           return NULL);  <span class="comment">// Note that we don't even bother freeing the memory.</span>
+    return object;
+}
+
+int count_subobjects(Object *object)
+{
+    PRECOND(object != NULL, return 0);  <span class="comment">// This is a function precondition.</span>
+    return list_length(object-&gt;subobjects);
+}
+
+struct ObjectData {
+    <span class="comment">// ...</span>
+};
+STATIC_ASSERT(sizeof(struct ObjectData) == 128,
+              "ObjectData does not match file record size");
+</div>
+    <div class="bad code">Object *create_object(void)
+{
+    Object *object = mem_alloc(sizeof(*object), 0, 0);
+    ASSERT(object != NULL);  <span class="comment">// This could legimitately fail.</span>
+    init_object(object);
+    ASSERT(object-&gt;state == NEW,
+           list_append(broken_objects, object);  <span class="comment">// Complex and difficult to test.</span>
+           return NULL);
+    return object;
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="macros">
+  <div class="rule-title">Macros</div>
+  <div class="rule-summary">Use judiciously and with care.</div>
+  <div class="rule-details">
+    <p>Macros are permitted when they serve a purpose which is difficult
+      or impossible to accomplish otherwise.  However, be especially
+      careful of unintended side effects when writing a macro (see the
+      examples below).</p>
+    <p>Note that many function-like uses of macros&mdash;specifically, those
+      which do not include control statements like <tt>return</tt> that
+      escape the scope of the macro and whose parameters take specific
+      types&mdash;can be replaced with <tt>static inline</tt> functions at
+      no cost to performance.  Doing so both avoids the potential problems
+      of macros and allows the compiler to perform its usual type-checking.</p>
+    <p><i>Rationale:</i> Preprocessor macros are a powerful metaprogramming
+      tool, but that power can easily hurt readability.  Since macros are
+      expanded before the source code is parsed, it's easy to write a macro
+      that has unintended consequences, and it can be difficult to figure
+      out exactly what those consequences were.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code"><span class="comment">/* Use parentheses around negative numeric values and expressions. */</span>
+#define INVALID_VALUE  (-1)
+#define DEGREES_TO_RADIANS  (PI / 180.0)
+
+<span class="comment">/* Use parentheses around macro parameters, since otherwise they can be
+ * expanded into something completely different from what you intended. */</span>
+#define DOUBLE(x)  ((x) * 2)
+
+<span class="comment">/* When possible, use an inline function (or several) instead of defining
+ * a macro. */</span>
+static inline float sqrf(float x) {return x*x;}
+static inline double sqr(double x) {return x*x;}
+
+<span class="comment">/* Bracket multiple statements or control structures with do {...} while (0)
+ * so they do not break a surrounding if/for/while. */</span>
+#define ABORT_IF_NEGATIVE(x)  do { \
+    if ((x) &lt; 0) {return -1;}      \
+} while (0)
+
+<span class="comment">/* Macros can be useful to report the source code location of an error (the
+ * DLOG() macro provided by SIL does this as well). */</span>
+#define LOG_ERROR(str)  log_error("%s:%d: %s", __FILE__, __LINE__, (str))</div>
+    <div class="bad code"><span class="comment">/* This definition will cause BAD_DOUBLE(x&lt;y ? x : y) to only double y,
+ * not x. */</span>
+#define BAD_DOUBLE(x)  (x * 2)
+
+<span class="comment">/* This definition would give an unexpected result if used as an operand
+ * in a multiplication expression, for example. */</span>
+#define BAD_INCREMENT(x)  (x) + 1
+
+<span class="comment">/* While this example is properly parenthesized, the two uses of "x" will
+ * cause any side effects in the actual parameter to be evaluated twice.
+ * Inline functions are a better choice here. */</span>
+#define SQR(x) ((x) * (x))
+
+<span class="comment">/* This definition will cause the structure of the function to change when
+ * BAD_ABORT_IF_NEGATIVE(x) is expanded.  (This case is also an example of
+ * why omitting <a href="#conditional-and-loop-statements">braces on if statements</a> is a bad idea.) */</span>
+#define BAD_ABORT_IF_NEGATIVE(x)  if ((x) &lt; 0) {return -1;}
+float myfunc(float x)
+{
+    if (x <= 0)
+        BAD_ABORT_IF_NEGATIVE(x);
+    else
+        x += sqrtf(x);
+    return x;
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="include-directives">
+  <div class="rule-title"><tt>#include</tt> directives</div>
+  <div class="rule-summary">Order headers alphabetically, using full
+    pathnames for each header.  Include system headers after SIL headers.</div>
+  <div class="rule-details">
+    <p>When including SIL headers in a source file, order the headers
+      componentwise alphabetically by full pathname, excluding the
+      <tt>.h</tt> filename extension.  As a corollary, each header should
+      declare all external types it references, except for those defined
+      in <tt>src/base.h</tt> (which will always be included first).</p>
+    <p>If you need to include any system headers, list them after all SIL
+      headers.  It may be useful to further subdivide these into standard
+      system headers and headers for specific system libraries.</p>
+    <p><i>Rationale (full pathnames):</i> Using the full pathname of a
+      header tells the reader immediately where the header is located; a
+      relative pathname would force the reader to check the location of the
+      source file and manually resolve the relative path.  Additionally, if
+      a system header happens to have the same name as a header you create,
+      the compiler may include the system header instead of yours if you
+      give only the filename in the <tt>#include</tt> directive.</p>
+    <p><i>Rationale (SIL headers first):</i> Including all SIL headers
+      before any system or other external headers ensures that SIL headers
+      do not attempt to make use of types or other declarations from those
+      external headers.  For example, including <tt>&lt;stdio.h&gt;</tt> at
+      the top of a source file would mask compiler errors from uses of the
+      <tt>FILE</tt> type in any subsequently included SIL headers.</p>
+    <p><i>Exception:</i> Use relative pathnames instead of full pathnames
+      for nested includes in public headers, to avoid requiring particular
+      compiler flags for client code.</p>
+    <p><i>Example:</i></p>
+      <div class="good code">#include "src/base.h"
+#include "src/foo.h"
+#include "src/foo/quux.h"  <span class="comment">// "foo/..." comes before "foo-".</span>
+#include "src/foo-bar.h"
+
+#include &lt;errno.h&gt;
+#include &lt;stdio.h&gt;
+
+#include &lt;FooLibrary/FooBase.h&gt;
+#include &lt;FooLibrary/FooExtras.h&gt;</div>
+  </div>
+</div>
+
+<div class="rule" id="nested-includes">
+  <div class="rule-title">Nested <tt>#include</tt>s</div>
+  <div class="rule-summary">When declaring external types, use a forward
+    declaration instead of a nested <tt>#include</tt> when possible.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Including a header file inside another header file
+      just to get the declaration of a structured type forces all users of
+      the header to pay the cost of loading the nested header.  Instead,
+      when possible, use forward declarations of <tt>struct</tt> and
+      <tt>union</tt> types.  (This generally means you'll need to use
+      "<tt>struct <i>type</i></tt>" or "<tt>union <i>type</i></tt>" instead
+      of just the type name in function declarations.)  Since C++ doesn't
+      allow forward declarations of <tt>enum</tt>s, headers which reference
+      <tt>enum</tt> types and which may be included from C++ code (for SIL,
+      this means all public headers) will have to use nested includes for
+      such types.</p>
+  </div>
+</div>
+
+<div class="rule" id="structure-tags-and-typedefs">
+  <div class="rule-title">Structure tags and <tt>typedef</tt>s</div>
+  <div class="rule-summary">When defining a <tt>struct</tt>, <tt>union</tt>,
+    or <tt>enum</tt> type, include a <tt>typedef</tt> which defines the tag
+    name as a type.</div>
+  <div class="rule-details">
+    <p>Typically, the <tt>typedef</tt> should precede the definition of the
+      structured type itself, so the type name can be used within the
+      definition (such as when defining a "next" pointer for a list).
+      However, C++ does not allow referencing an <tt>enum</tt> before it
+      has been defined, so in that case, the <tt>typedef</tt> must follow
+      the <tt>enum</tt> (or the <tt>enum</tt> must be defined within the
+      <tt>typedef</tt> statement).</p>
+    <p><i>Rationale:</i> In C++, all tags for structured types (including
+      <tt>class</tt>, <tt>struct</tt>, <tt>union</tt>, and <tt>enum</tt>)
+      are automatically defined as type names, but in C, an explicit
+      <tt>typedef</tt> is required for each type.  Since C++ will not
+      complain about such <tt>typedef</tt> statements, they should be
+      included for all structured types visible to C code.</p>
+  </div>
+</div>
+
+<div class="rule" id="branch-hints">
+  <div class="rule-title">Branch hints</div>
+  <div class="rule-summary">Use <tt>UNLIKELY()</tt> to indicate tests for
+    error conditions.  Otherwise, use branch hints sparingly and only after
+    analyzing performance.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> As noted in the GCC documentation for the
+      <tt>__builtin_expect()</tt> intrinsic used to implement branch hints,
+      "programmers are notoriously bad at predicting how their programs
+      actually perform", and what seems like an "obvious" optimization may
+      in fact hurt performance due to things like unexpected calling
+      patterns or CPU idiosyncrasies.  However, when checking for errors
+      from system or low-level functions (such as when allocating memory)
+      or verifying function parameters, marking a comparison with
+      <tt>UNLIKELY()</tt> serves as documentation that the comparison is
+      testing for an exceptional condition without requiring the reader to
+      understand the details of the comparison, while also providing
+      slightly better performance on the non-failing code path.</p>
+  </div>
+</div>
+
+<!------------------------------------------------------------------------>
+<hr/>
+
+<h2 class="section-title" id="section-2">2. Formatting</h2>
+
+<div class="rule" id="character-encoding">
+  <div class="rule-title">Character encoding</div>
+  <div class="rule-summary">All source files are encoded in UTF-8, but
+    avoid non-ASCII characters when possible.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> UTF-8 is currently the <i>de facto</i> standard
+      for text encoding, and full Unicode (including <tt>L'...'</tt>
+      character values) is supported by at least GCC and recent versions of
+      Clang.  However, support is by no means universal, so try to avoid
+      characters outside the ASCII range in non-comment source code, and
+      test extensively if you do use them.</p>
+  </div>
+</div>
+
+<div class="rule" id="line-length">
+  <div class="rule-title">Line length</div>
+  <div class="rule-summary">Lines should not be longer than 79 columns.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> 80 columns has proven to be a good balance between
+      avoiding unnecessary wrapping and keeping the text narrow enough to
+      scan easily (that is, without forcing the eyes to move back and forth
+      on each line).  80 columns is also a fairly standard width for
+      terminal programs and editors.  However, some such programs have
+      troubles with lines that are exactly 80 columns long (for example,
+      Emacs will wrap the 80th character to the next line when using an
+      80-column display); for this reason, lines should be kept to 79
+      characters when possible.</p>
+    <p><i>Exceptions:</i></p>
+    <ul>
+      <li>If the 80th character on a line is trailing punctuation, such as
+        a semicolon or opening brace, it's okay to leave it on that line
+        (but it's still better to wrap if that's reasonable).</li>
+      <li>For cases where there is a strong correlation between physical
+        lines and their contents, such as a sequence of strings containing
+        lines of text which will be written consecutively to the screen,
+        prefer keeping the correlation even if it results in lines longer
+        than 80 columns.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="rule" id="indentation">
+  <div class="rule-title">Indentation</div>
+  <div class="rule-summary">The basic indentation unit is four columns.
+    Outdent half a unit (two columns) for labels, including <tt>case</tt>
+    labels in a <tt>switch</tt> block.  Indent one unit or to the opening
+    parenthesis for continued lines, except when
+    <a href="#related-subexpressions">aligning related
+    subexpressions</a>.</div>
+  <div class="rule-details">
+    <p>The SIL source tree includes an Emacs directory-local variable list
+      (<tt>.dir-locals.el</tt>) which causes the Emacs editor to use the
+      proper indentation settings.</p>
+    <p><i>Rationale:</i> Four columns is enough to clearly indicate the
+      nesting depth at a glance, without being so wide that it pushes
+      reasonably nested code off the edge of the screen.  (Corollary: If
+      code is indented so much that the line length limit becomes a
+      problem, the nesting level is too deep.)  Four columns is also
+      divisible by two to provide an intermediate indentation for labels.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">int func(int x)
+{
+    if (x &lt; 0) {
+        goto error;
+    }
+    return x * (x+1);
+  error:
+    return -1;
+}
+
+float my_function_with_a_long_name(int my_first_parameter,
+                                   float my_second_parameter)
+{
+    if (my_first_parameter &gt; 0) {
+        return my_function_with_a_long_name(
+            my_first_parameter - 1, sqrtf(my_second_parameter));
+    } else {
+        return my_second_parameter;
+    }
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="tabs-vs-spaces">
+  <div class="rule-title">Tabs vs. spaces</div>
+  <div class="rule-summary">Always use spaces, never tabs.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> There is little consensus between editor programs
+      on the width of a tab stop; thus, to properly read code indented with
+      tabs, the reader of the code must make a special effort to configure
+      their software properly.  It's far preferable for the (single or few)
+      writers of source code to make the effort to use spaces rather than
+      force the (many) readers to change their editor settings for each
+      program's source code they view.</p>
+  </div>
+</div>
+
+<div class="rule" id="one-statement-per-line">
+  <div class="rule-title">One statement per line</div>
+  <div class="rule-summary">Only one statement or label is allowed on a line.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> It can be easy to overlook extra statements on
+      the same line, especially when they are infrequent.</p>
+    <p><i>Exception:</i> If all cases in a <tt>switch</tt> will fit on one
+      line each and contain no more than one statement (excluding
+      <tt>break</tt>, <tt>return</tt>, or <tt>goto</tt>), the statements may
+      be moved to the same lines as their respective <tt>case</tt> labels.
+      In this case, do not outdent the <tt>case</tt> labels.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">x /= 2;  <span class="comment">// Good.</span>
+y /= 2;
+
+switch (value) {
+    case 10: return 2;  <span class="comment">// Note indentation.</span>
+    case 20: return 5;
+    default: return 0;
+}
+
+int myfunc(int input)
+{
+    int result;
+    switch (input) {
+      case -1:
+        <span class="comment">/* This could potentially all fit on one line, but that would violate
+         * the one-statement-per-line rule since there are two non-label,
+         * non-"break" statements for this case. */</span>
+        errors++;
+        result = -1;
+        break;
+      default:
+        result = input+1;
+        break;
+    }
+    return result;
+}</div>
+    <div class="bad code">x /= 2; y /= 2;  <span class="comment">// Bad.</span>
+
+int myfunc(int input)
+{
+    <span class="comment">// ...</span>
+    return 1;
+  error: return 0;  <span class="comment">// Put the return on a separate line.</span>
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="related-subexpressions">
+  <div class="rule-title">Related subexpressions</div>
+  <div class="rule-summary">Line up related subexpressions when feasible.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> If an expression consists of several related
+      subexpressions, it can be easier to read when those subexpressions
+      are lined up on separate lines, so the reader can skim down and
+      easily spot the differences.  In some cases, it can be useful to
+      insert null operations (such as a shift by zero) for parallelism.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">pixel = (red   &lt;&lt;  0)
+      | (green &lt;&lt;  8)
+      | (blue  &lt;&lt; 16)
+      | (alpha &lt;&lt; 24);
+
+if (x &gt;= 0 &amp;&amp; x &lt; width
+ &amp;&amp; y &gt;= 0 &amp;&amp; y &lt; height
+ &amp;&amp; z &gt;= 0 &amp;&amp; z &lt; depth) {
+    <span class="comment">// ...</span>
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="whitespace-around-operators">
+  <div class="rule-title">Whitespace around operators</div>
+  <div class="rule-summary">Put one space around binary operators except
+    "<tt>-&gt;</tt>" and "<tt>.</tt>", and no spaces between a unary
+    operator and its operand.</div>
+  <div class="rule-summary">
+</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Whitespace improves readability when used in
+      moderation.  Omitting whitespace around member reference operators
+      and unary operators emphasizes their tighter binding.</p>
+    <p><i>Exceptions:</i></p>
+    <ul>
+      <li>In complex expressions with multiple operators, it's okay to omit
+        whitespace in inner terms as long as the overall expression remains
+        readable.  In some cases, it may be more readable to break the
+        expression across multiple lines or use extra variables to hold
+        intermediate values.</li>
+      <li>It's also permissible to omit whitespace in extremely simple
+        expressions, such as "<tt>x+1</tt>", but prefer to include the
+        whitespace if doing so doesn't detract from readability.</li>
+    </ul>
+    <p><i>Examples:</i></p>
+    <div class="good code">i = j * 2;  <span class="comment">// Or "i = j*2".</span>
+object-&gt;refcount++;
+result += i*60 + (j+59)/60;
+<span class="comment">/* Sometimes a unary minus can be hard to see next to a long variable name.
+ * In that case, add parentheses around the operand rather than inserting
+ * a space. */</span>
+value = -(long_named_variable);</div>
+    <div class="bad code">x=1;  <span class="comment">// Never omit spaces around an assignment operator.</span>
+value = - long_named_variable;  <span class="comment">// Never insert a space after a unary operator.</span></div>
+  </div>
+</div>
+
+<div class="rule" id="whitespace-in-function-and-macro-calls">
+  <div class="rule-title">Whitespace in function and macro calls</div>
+  <div class="rule-summary">Add spaces after commas; don't add spaces around parentheses.</div>
+  <div class="rule-details">
+    <p><i>Exception:</i> It's okay to omit spaces after commas in nested
+      function calls, as long as doing so doesn't hurt readabililty.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">function(param1, param2);
+MACRO(param1, strchr(string,'/'), param3);</div>
+  </div>
+</div>
+
+<div class="rule" id="parentheses-in-expressions">
+  <div class="rule-title">Parentheses in expressions</div>
+  <div class="rule-summary">Use enough parentheses to make the expression
+    easy to read at a glance.  Always use parentheses to separate operators
+    with confusing precedence.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Some combinations of operators are particularly
+      susceptible to precedence errors:</p>
+    <ul>
+      <li>The logical operator <tt>&amp;&amp;</tt> has a higher precedence
+        than <tt>||</tt>, but especially since the operands are often long
+        subexpressions, it can be easy to lose track of precedence without
+        parentheses.</li>
+      <li>The bitwise operators (<tt>&amp; | ^</tt>) have a lower precedence
+        than the relational operators (<tt>== != &lt; &lt;= &gt; &gt;=</tt>).
+        For example, expressions which extract and test a bitfield within a
+        value need parentheses around the extraction subexpression.</li>
+      <li>Similarly, the bit shift operators have a lower precedence than
+        the arithmetic operators.</li>
+    </ul>
+    <p>The compiler will generally emit a warning if parentheses are missing
+      in any of the cases listed above.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">if ((x &lt; 0 || x &gt; width) &amp;&amp; !allow_out_of_bounds) {
+    <span class="comment">// ...</span>
+}
+
+if ((pixel &amp; 0x001F) == 0x1F) {
+    red_is_maximum = 1;
+}
+
+component_sum =
+    (pixel &amp; 0x001F) + ((pixel &amp; 0x03E0) &gt;&gt; 5) + ((pixel &amp; 0x7C00) &gt;&gt; 10);</div>
+  </div>
+</div>
+
+<div class="rule" id="parentheses-with-defined-sizeof-and-return">
+  <div class="rule-title">Parentheses with <tt>defined</tt>, <tt>sizeof</tt>,
+    and <tt>return</tt></div>
+  <div class="rule-summary">Treat <tt>sizeof</tt> and <tt>defined</tt> like
+    functions; don't use unnecessary parentheses around return values.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> While C does not require parentheses around the
+      arguments to <tt>defined</tt> or (when the argument is a variable)
+      <tt>sizeof</tt>, those keywords act like functions in that they
+      return values<sup>*</sup>, so uses of those keywords should be styled
+      like function calls.  <tt>return</tt>, on the other hand, does not
+      behave like a function (it doesn't generate a value, and you couldn't
+      put it on the right side of an assignment operator), so it shouldn't
+      be styled like one.
+      <br/><span class="footnote"><sup>*</sup>Technically, <tt>defined</tt>
+      doesn't "return a value" since it's not recognized by the compiler at
+      all, but the preprocessor translates it into a boolean value, so it's
+      the same sort of beast.</span></p>
+    <p><i>Examples:</i></p>
+    <div class="good code">#if defined(DEBUG) &amp;&amp; defined(__GNUC__)
+    <span class="comment">/* GCC magic goes here. */</span>
+#endif
+
+int data_size(DataStruct *data, int num_data)
+{
+    return sizeof(*data) * num_data;
+}
+
+int is_transparent_pixel(uint16_t pixel)
+{
+    <span class="comment">/* Parentheses around a return value are acceptable when they help
+     * readability.  Here, the outer parentheses help ensure that a reader
+     * skimming the code does not miss the "== 0" at the end of the
+     * expression.  Note the space before the opening parenthesis. */</span>
+    return ((pixel &amp; 0x8000) == 0);
+}</div>
+    <div class="bad code">int bad_func(struct foo *ptr, int count)
+{
+    int size = count * sizeof *ptr;  <span class="comment">// Looks like "count times sizeof times ptr".</span>
+    size += count * sizeof int;  <span class="comment">// This doesn't even compile.</span>
+    return(size);  <span class="comment">// return is not a function!</span>
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="conditional-and-loop-statements">
+  <div class="rule-title">Conditional and loop statements</div>
+  <div class="rule-summary">Always use braces; insert a space before the
+    opening parenthesis; add spaces after semicolons in a <tt>for</tt>
+    statement; put the opening brace on the same line as the closing
+    parenthesis.</div>
+  <div class="rule-details">
+    <p><i>Rationale (mandatory braces):</i> Failing to use braces with
+      control statements can easily lead to bugs, such as when attempting
+      to add a second statement to an <tt>if</tt> without a block.</p>
+    <p><i>Exception (opening brace):</i> The opening brace can be moved to
+      the next line if it doesn't fit on the same line, or to avoid
+      confusion between a continued line of the control statement and the
+      first line of the nested block when the two lines have similar
+      indentation (see the second <tt>for</tt> example below).</p>
+    <p>If a block is long, it can be useful to annotate the closing brace
+      with the control statement that began the block (see the
+      <tt>while</tt> example below).</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">if (flag1) {
+    <span class="comment">// ...</span>
+} else if (flag2) {  <span class="comment">// Treat "else if" as a single keyword.</span>
+    <span class="comment">// ...</span>
+} else {
+    <span class="comment">// ...</span>
+}
+
+while (alive()) {
+    <span class="comment">// ...</span>
+}  // while (alive())
+
+for (i = 0; i &lt; count; i++) {
+    <span class="comment">// ...</span>
+}
+
+<span class="comment">/* Here, the opening brace is moved to its own line to avoid confusion between
+ * the continuation of the "for" statement and the first line of the block. */</span>
+for (i = 0, x = 1, y = 1; i &lt; count;
+     i++, x *= 2, y *= 2)
+{
+    <span class="comment">// ...</span>
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="switch-statements">
+  <div class="rule-title"><tt>switch</tt> statements</div>
+  <div class="rule-summary">Braces around case blocks are optional.  Use
+    the <tt>FALLTHROUGH</tt> macro (from <tt>&lt;SIL/base.h&gt;</tt>) if a
+    case falls through to the next case.</div>
+  <div class="rule-details">
+    <p><i>Rationale (optional braces):</i> Unlike other control statements,
+      the use of braces in <tt>switch</tt> statements has no effect on
+      control flow.  In general, use braces when you need to define
+      variables local to that case.</p>
+    <p><i>Rationale (use of <tt>FALLTHROUGH</tt>):</i> It can be hard to
+      tell at a glance whether a missing <tt>break</tt> statement is
+      intentional or not.  Documentation helps reassure the reader of the
+      intended behavior, suppresses "code falls through" warnings from
+      modern compilers, and also avoids the risk that someone (maybe even
+      you) will accidentally insert a <tt>break</tt> during a code cleanup
+      session.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">switch (value) {
+  case 1:
+    <span class="comment">// ...</span>
+    FALLTHROUGH;  <span class="comment">// Document that the missing "break" is intentional.</span>
+  case 2:
+    <span class="comment">// ...</span>
+    break;
+  case 3: {
+    int local_var;  <span class="comment">// Local to this case only.</span>
+    <span class="comment">// ...</span>
+    break;
+  }  // case 3
+  default:
+    <span class="comment">// ...</span>
+    break;
+}  // switch (value)</div>
+  </div>
+</div>
+
+<div class="rule" id="function-pointers">
+  <div class="rule-title">Function pointers</div>
+  <div class="rule-summary">Explicitly dereference function pointers when
+    calling through them.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Using an explicit dereference operation makes it
+      clear to the reader that the thing being called is a function pointer
+      and not an actual function.</p>
+    <p><i>Exception:</i> Function pointers accessed through a structure do
+      not need to be explicitly dereferenced if they are used like C++
+      instance methods.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">(*function_ptr)(args);
+object-&gt;method(object, args);  <span class="comment">// Where "method" is a function pointer.</span></div>
+    <div class="bad code">function_ptr(args);</div>
+  </div>
+</div>
+
+<div class="rule" id="function-declarations-and-definitions">
+  <div class="rule-title">Function declarations and definitions</div>
+  <div class="rule-summary">Use an explicit <tt>void</tt> with functions
+    that take no parameters.  The opening brace for a function body goes on
+    the following line.</div>
+  <div class="rule-details">
+    <p><i>Rationale (explicit <tt>void</tt>):</i> In C (as opposed to C++),
+      an empty parameter list means that the function's parameters are
+      unspecified.  This prevents the compiler from checking the number and
+      types of parameters at call sites, so functions which take no
+      parameters should have an explicit <tt>void</tt> to indicate that
+      fact to the compiler.</p>
+    <p><i>Rationale (opening brace on following line):</i> Putting the
+      brace on its own line gives an additional visual indication that the
+      brace starts a new function.</p>
+    <p><i>Exception:</i> If the function is both very short (1-2 lines)
+      and defined with static linkage, it is acceptable to put the
+      definition's opening brace on the same line as the function
+      declaration.  If the function body fits on the same line as the
+      declaration, the entire function may be written on one line.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">void end_program(void)  <span class="comment">// Not "void end_program()".</span>
+{
+    <span class="comment">// ...</span>
+}
+
+<span class="comment">/* Concise format for a short function. */</span>
+static inline float sqrf(float x) {return x*x;}</div>
+  </div>
+</div>
+
+<div class="rule" id="order-of-function-definitions">
+  <div class="rule-title">Order of function definitions</div>
+  <div class="rule-summary">Within each source file, order function
+    definitions either top-down (interface functions first, followed by
+    local functions) or bottom-up (local functions first, interface
+    functions last).  In the top-down format, declare local functions in
+    the same order they are defined.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Using a consistent order for function definitions
+      helps readers follow the program structure.</p>
+    <p><i>Exception:</i> Short local functions which are only used in one
+      place, such as a callback function whose pointer is passed to an
+      external API, may be defined immediately before the function that
+      uses them.</p>
+    <p>SIL code generally prefers the top-down style, but since C requires
+      local (<tt>static</tt>) functions to be declared before they are
+      used, each local function must be declared and defined at separate
+      locations in the same file, which can get somewhat repetitive.  Test
+      sources in particular tend to put "helper" functions at the top,
+      followed by the actual test cases (the "interface" functions by this
+      rule), thus obviating the need for separate declarations.</p>
+  </div>
+</div>
+
+<div class="rule" id="comments">
+  <div class="rule-title">Comments</div>
+  <div class="rule-summary">Use <tt>//</tt> for inline comments, separated
+    from the code by at least two spaces; prefer <tt>/*...*/</tt> for block
+    comments.  Mark known problems or shortcomings with "FIXME".</div>
+  <div class="rule-details">
+    <p>When using inline comments on multiple consecutive or nearby lines,
+      align the starting columns of the comments as long as doing so
+      doesn't insert an inordinate amount of space between the code and the
+      comment.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">/* Short explanation of the upcoming code. */
+if (need_check) {
+    // FIXME: See if we can get away with just 0-9.
+    int start = 0;  // Description of variable.
+    int end = 99;   // Description of variable (aligned with above comment).
+    <span class="comment">// ...</span>
+}</div>
+    <div class="bad code">MyLongStructureTypeName *structure;  // Description of variable.
+int result;                          // Too much space here.
+int i;                               // Wait, which line does this go with?</div>
+  </div>
+</div>
+
+<div class="rule" id="function-headers">
+  <div class="rule-title">Function headers</div>
+  <div class="rule-summary">Insert a block comment of the appropriate
+    format above each function declaration.  Do not copy the comment to
+    the function definition.</div>
+  <div class="rule-details">
+    <p><i>Rationale (standard header format):</i> Including a header of a
+      fixed format allows readers to quickly determine the purpose of and
+      calling pattern for a function without having to read the function's
+      code.</p>
+    <p><i>Rationale (include at declaration):</i> Keeping the header with
+      the declaration allows readers to easily browse the list of declared
+      functions, such as in a header file, without having to scan over the
+      implementing code for each function.</p>
+    <p><i>Rationale (do not include at definition):</i> Experience has
+      shown that keeping two copies of the function header will quickly
+      lead to documentation desyncs as function signatures change.  This
+      naturally does not apply to <tt>static</tt> functions which do not
+      have a separate declaration (see
+      <a href="#order-of-function-definitions">order of function
+      definitions</a> above).</p>
+    <p><i>Exception:</i> The full header may be omitted for short local
+      functions which have no separate declaration and are defined close to
+      their place of use, provided that a short comment describing the
+      purpose of the function is included instead.</p>
+    <p>See the source code for details of the function header format.  Note
+      that the SIL function header format deliberately does <i>not</i> use
+      markup tokens for tools like Doxygen; the headers are intended to be
+      easily perusable by someone looking directly at the source code,
+      without requiring separate tools to interpret the comments.</p>
+  </div>
+</div>
+
+<!------------------------------------------------------------------------>
+<hr/>
+
+<h2 class="section-title" id="section-3">3. Naming</h2>
+
+<div class="rule" id="general-naming-rules">
+  <div class="rule-title">General naming rules</div>
+  <div class="rule-summary">Names should be descriptive.  Don't abbreviate
+    unnecessarily, but avoid excessive verbosity.</div>
+  <div class="rule-details">
+    <p>In general, an identifier's name should immediately tell the reader
+      the purpose of the identifier, but it should be concise enough that
+      its length does not obscure the structure of the code.  For example,
+      <tt>LIMIT</tt> would be a poor name for a global constant; the name
+      tells us nothing about what sort of limit it is.  But the same
+      <tt>LIMIT</tt> might make perfect sense in a short function whose
+      sole purpose was to bound its parameter to be less than a certain
+      value, and indeed a longer name would serve no purpose except to
+      clutter up the code.</p>
+    <p>Similarly, a file's name should make the file's purpose clear to
+      someone looking at a directory listing, but should not be so long as
+      to clutter log messages (which include the name of the source file
+      which generated the message).  In the case of filenames, it's
+      acceptable to include the directory path when determining whether a
+      filename is "clear"; for example, <tt>resource/core.c</tt> clearly
+      refers to core functionality for resource management, and does not
+      need to be expanded to <tt>resource/resource-core.c</tt>.</p>
+    <p>Avoid overusing abbreviations, since they can reduce readability by
+      forcing the reader to stop and mentally expand the abbreviation each
+      time the identifier is used.  For example, in a function that uses a
+      variable to hold a count of objects, <tt>nobj</tt> would be a poor
+      name for the variable since its meaning is not immediately obvious to
+      a reader unfamiliar with the code.  <tt>num_obj</tt> would be better,
+      but unless the variable is heavily used throughout the function,
+      <tt>num_objects</tt> is more friendly to the reader.  However,
+      <tt>number_of_objects</tt> would be unnecessarily verbose, since a
+      <tt>num_</tt> prefix is generally understood to mean "number of".</p>
+    <p>Single-letter and similarly short variable names should be avoided
+      except in cases where their meaning is obvious and generally accepted.
+      For example, <tt>i</tt> is widely accepted as an iterator variable
+      and may be used in that context, but it should not be used for a
+      temporary variable, even in a limited scope.  Similarly, short names
+      for types or functions are acceptable when they are clearly derived
+      from similar names in the standard libraries.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">#define FRAME_RATE_MIN  20  <span class="comment">// Clear and concise.</span>
+
+#define PI  3.1415926535897932  <span class="comment">// Short but well-known; fine even at global scope.</span>
+
+static inline double sqr(double x) {  <span class="comment">// Follows the pattern of sqrt(), so okay.</span>
+    return x*x;
+}
+
+void collide_objects_with_player(void)  <span class="comment">// Clear and reasonably concise.</span>
+{
+    const int player_x = player->position.x;  <span class="comment">// Not just "x" or "y".</span>
+    const int player_y = player->position.y;
+    for (int i = 0; i < num_objects; i++) {  <span class="comment">// "i" is well-known as an iterator.</span>
+        const int object_x = objects[i].position.x;
+        const int object_y = objects[i].position.y;
+        if (player_x == object_x &amp;&amp; player_y == object_y) {
+            <span class="comment">// ...</span>
+        }
+    }
+}</div>
+    <div class="bad code">#define FRATE  20  <span class="comment">// Not obvious what it's used for.</span>
+#define MINIMUM_NUMBER_OF_FRAMES_PER_SECOND  20  <span class="comment">// Way too verbose.</span>
+
+void doobjs(void)  <span class="comment">// Not obvious what the function does.</span>
+{
+    <span class="comment">/* If these were the only coordinates used in the function, "x" and "y"
+     * might be okay, but here they reduce readability because the function
+     * uses two sets of coordinates. */</span>
+    const int x = player->position.x;
+    const int y = player->position.y;
+    <span class="comment">/* "o" is not recognized as an iterator, so unlike "i" it's unacceptable. */</span>
+    for (int o = 0; o < num_objects; o++) {
+        <span class="comment">/* Again, it's unclear from the names what these coordinates are. */</span>
+        const int x2 = objects[o].position.x;
+        const int y2 = objects[o].position.y;
+        if (x == x2 &amp;&amp; y == y2) {
+            <span class="comment">// ...</span>
+        }
+        <span class="comment">// ...</span>
+    }
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="function-naming-rules">
+  <div class="rule-title">Function naming rules</div>
+  <div class="rule-summary">Name functions with a part of speech
+    appropriate to the function's behavior.  Use prefixes or (for C++ code)
+    namespaces to indicate the conceptual hierarchy of a function.</div>
+  <div class="rule-details">
+    <p>Functions can be broken down into three major groups:</p>
+    <ul>
+      <li><b>Functions which perform an action:</b> for example, resource
+        allocation or graphics rendering.  These should be named using
+        verbs or verb phrases.</li>
+      <li><b>Functions which return data:</b> for example, property
+        accessors.  These should be named using nouns or noun phrases.
+        If the noun or noun phrase alone is ambiguous, it may be prefixed
+        with "<tt>get_</tt>".</li>
+      <li><b>Functions which evaluate data:</b> for example, comparison
+        functions.  These should be named using adjectives or adjectival
+        phrases.</li>
+    </ul>
+    <p>If a function fits in two or more groups, name it based on the one
+      which best represents the function's overall behavior&mdash;though
+      that may also be a sign that the function is too complex and should
+      be refactored into multiple smaller functions (also see below
+      regarding <a href="#function-complexity">function complexity</a>).</p>
+    <p><i>Rationale (part of speech):</i> Using an appropriate part of
+      speech gives the reader a useful hint as to the function's behavior
+      without forcing the reader to check the function's documentation.
+      For example, an accessor function named using a noun phrase reassures
+      the reader that the function does not modify an object passed to it.</p>
+    <p><i>Rationale (prefixes):</i> Prefixes or namespaces provide the
+      reader with information about the type of data processed or operation
+      performed by the function, again reducing the need for the reader to
+      consult the function's documentation.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code"><span class="comment">/* A graphics-related function which reads pixel data from the display. */</span>
+void graphics_read_pixels(int x, int y, int w, int h, void *buffer);
+
+<span class="comment">/* A function which returns the width and height of a texture.  Note that
+ * this is treated as an accessor function even though it is not, strictly
+ * speaking, a pure function (since it writes through the return pointers
+ * passed as the second and third arguments); conceptually, it is a pure
+ * function which returns two values, and it writes through pointers only
+ * because the C language does not allow returning multiple values from a
+ * function. */</span>
+void texture_size(int texture, int *width_ret, int *height_ret);
+
+<span class="comment">/* A function which checks and returns whether a work queue is busy. */</span>
+int workqueue_is_busy(int workqueue);</div>
+    <div class="bad code"><span class="comment">/* Even as a local function name, the lack of a prefix makes it unclear at
+ * call sites what type of data the function operates on.  Also, the use of
+ * the verb "read" might make readers wonder whether the function performs
+ * any expensive processing to return its value, as opposed to simply
+ * retrieving a property value. */</span>
+static int read_width(int texture);</div>
+  </div>
+</div>
+
+<div class="rule" id="filename-formatting-rules">
+  <div class="rule-title">Filename formatting rules</div>
+  <div class="rule-summary">Use accepted filename extensions.  Give each
+    file in a directory a unique name exclusive of the extension.  Avoid
+    non-alphanumeric characters other than hyphen (<tt>-</tt>) and underscore
+    (<tt>_</tt>).</div>
+  <div class="rule-details">
+    <p>Use the filename extensions listed below for each source file type:</p>
+      <ul>
+        <li><b>C source:</b> <tt>.c</tt></li>
+        <li><b>C++ source:</b> <tt>.cc</tt></li>
+        <li><b>Objective-C source:</b> <tt>.m</tt></li>
+        <li><b>Objective-C++ source:</b> <tt>.mm</tt></li>
+        <li><b>Assembly:</b> <tt>.s</tt> (lowercase <tt>s</tt>)</li>
+        <li><b>Assembly with C preprocessor directives:</b> <tt>.S</tt>
+          (capital <tt>S</tt>)</li>
+      </ul>
+    <p><i>Rationale (filename extensions):</i> While not strictly required
+      on modern operating systems, the filename extension is an accepted
+      way to inform the user of the type of content in the file.  Some
+      programs (including compilers and IDEs) also use the file extension
+      to guess the file's content type, and using a nonstandard extension
+      would confuse such programs to the detriment of the user.</p>
+    <p><i>Rationale (unique names):</i> All source files are compiled to
+      object files with the same filename extension (typically <tt>.o</tt>).
+      If two source files in the same directory have the same name but a
+      different extension, their object files would collide, breaking the
+      build.  If it is necessary to have two source files in different
+      languages with the same purpose (for example, when implementing a
+      C++ interface to C functions), use the base filename for the source
+      file with the most nontrivial code, and rename other files to avoid
+      object file collision.  For example: <tt>utilities.c</tt>,
+      <tt>utilities-cxx.cc</tt>, <tt>utilities-objc.m</tt></p>
+    <p><i>Rationale (non-alphanumeric characters):</i> Non-alphanumeric
+      characters may have special meanings to some systems, preventing
+      files whose names contain those characters from being used properly
+      (or at all!) on such systems.  For example, quote characters are used
+      on many systems to enclose filenames containing spaces; conversely,
+      spaces are used on most systems to separate command arguments, and
+      including a space in a filename can cause builds to break in
+      unexpected ways.  The only symbols accepted as safe across all
+      systems are the hyphen and underscore.  Non-ASCII characters should
+      also be avoided because some users' systems may not be able to
+      display them properly.</p>
+    <p>Note that due to limitations of the POSIX-style library archive
+      (<tt>.a</tt>) format, code intended to be compiled into a static
+      library on POSIX systems must also ensure that no two files which
+      will be included in the library have the same name <i>exclusive</i>
+      of directory name; thus, <tt>dir1/file.o</tt> and <tt>dir2/file.o</tt>
+      cannot be included in the same static library.  SIL is not designed
+      to be compiled into a static library and thus does not follow this
+      rule.</p>
+  </div>
+</div>
+
+<div class="rule" id="identifier-formatting-rules">
+  <div class="rule-title">Identifier formatting rules</div>
+  <div class="rule-summary">Use <tt>MixedCase</tt> for type names,
+    <tt>UPPER_CASE_WITH_UNDERSCORES</tt> for constants and preprocessor
+    macros, and <tt>lower_case_with_underscores</tt> for functions,
+    variables, and structure members.</div>
+  <div class="rule-details">
+    <p><i>Examples:</i></p>
+    <div class="good code">#define PI  3.1415926535897932
+
+enum OperationStatus {
+    STATUS_OK = 1,
+    STATUS_FAILED = 2,
+};
+typedef enum OperationStatus OperationStatus;  <span class="comment">// See note on <a href="#structure-tags-and-typedefs">typedefs</a> above.</span>
+
+typedef struct OperationRecord OperationRecord;
+struct OperationRecord {
+    OperationStatus status;
+    void *private;
+};
+
+OperationStatus run_operation(OperationRecord *operation)
+{
+    const float timeout = 0.1;  <span class="comment">// "TIMEOUT" would also be acceptable.</span>
+    operation->status = internal_run_operation(operation->private, timeout);
+    if (operation->status != STATUS_OK) {
+        static int did_warn = 0;
+        if (!did_warn) {
+            DLOG("Operation failed!");
+            did_warn = 1;
+        }
+    }
+    return operation->status;
+}</div>
+  </div>
+</div>
+
+<div class="rule" id="use-of-cxx-keywords-as-c-identifiers">
+  <div class="rule-title">Use of C++ keywords as C identifiers</div>
+  <div class="rule-summary">C++ keywords may be used as identifier names in
+    C code as long as they are appropriate, but take care when such
+    identifiers appear in header files.</div>
+  <div class="rule-details">
+    <p>C++ reserves a number of keywords which can also be reasonably used
+      as identifier names; for example, <tt>try</tt> could be a counter
+      for an operation which may need to be retried several times, and
+      <tt>this</tt> can be used as an object pointer when implementing
+      instance-method-like functions in C.  As long as the names are
+      appropriate for the uses to which they are put, they may be freely
+      used in C code.</p>
+    <p>However, care is needed when such identifiers appear in header
+      files, such as when used as structure field names.  In this case,
+      renaming the identifier is usually best, but if the identifier does
+      not need to be referenced by C++ code (for example, if it is a
+      parameter name in a function declaration), it is also permissible to
+      bracket the header with a <tt>#define</tt>/<tt>#undef</tt> pair:</p>
+    <div class="good code">#ifdef __cplusplus
+# define private private_  <span class="comment">// Avoid errors when included from C++ source.</span>
+#endif
+
+<span class="comment">// ...</span>
+
+#ifdef __cplusplus
+# undef private  <span class="comment">// Restore the normal meaning of "private" for subsequent C++ code.</span>
+#endif</div>
+  </div>
+</div>
+
+<!------------------------------------------------------------------------>
+<hr/>
+
+<h2 class="section-title" id="section-4">4. Other</h2>
+
+<div class="rule" id="use-of-comments">
+  <div class="rule-title">Use of comments</div>
+  <div class="rule-summary">Use comments to summarize the purpose of a
+    block of code or to explain the rationale behind or implications of a
+    particular piece of logic.  Do not use comments to simply rephrase the
+    code in native language.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> Comments should provide additional information (in
+      other words, "commentary") to the reader.  Assume for this purpose
+      that the reader understands the programming language better than you
+      do, so any comments that simply state <i>what</i> the code is doing
+      are useless.  Instead, comments should explain <i>why</i> the code is
+      written the way it is, to provide insight to a reader who does not
+      understand the problem you are trying to solve.  As a corollary, if
+      you do feel the need to explain what the code is doing, it probably
+      means the code itself is poorly written and should be fixed.</p>
+    <p>Notwithstanding the above, it can be useful to prepend comments to
+      longer blocks of code which summarize the logic contained in the
+      block.  While these would ordinarily be discouraged as "what"
+      comments (as opposed to "why" comments), they can help the reader
+      quickly skim through larger functions without having to read the
+      entire function, much like subheadings in a technical document.
+      Other code styles recommend appropriately named subroutines for this
+      purpose, but SIL style prefers not to extract blocks of logic unique
+      to a particular function (see below regarding
+      <a href="#function-complexity">function complexity</a>).</p>
+    <p><i>Examples:</i></p>
+    <div class="good code"><span class="comment">/* This provides additional information to the reader explaining why the
+ * assertion is safe, without requiring the reader to have memorized the
+ * entire program structure. */</span>
+ASSERT(blocksize > 0);  // Or it would have been handled by the caller.
+blocks = size / blocksize;
+
+<span class="comment">/* This computation is sufficiently obscure that a comment helps the
+ * reader understand its purpose. */</span>
+if ((size & (size - 1)) != 0) {
+    return 0;  // Reject sizes which are not powers of two.
+}
+
+<span class="comment">/* This comment lets the reader quickly understand what the loop is doing
+ * without having to read through the entire block of code. */</span>
+/* Find a block which matches our requirements. */
+Block *block = NULL;
+for (Block *i = block_list; !block && i; i = i->next) {
+    <span class="comment">// (lots of code here)</span>
+}</div>
+    <div class="bad code"><span class="comment">/* The meaning of this line is perfectly clear without the comment. */</span>
+counter++;  // Increment counter.
+
+<span class="comment">/* This comment would be unnecessary if proper variable names were used. */</span>
+px += t*s/w;  // Add distance moved in tiles to player position.
+</div>
+  </div>
+</div>
+
+<div class="rule" id="function-complexity">
+  <div class="rule-title">Function complexity</div>
+  <div class="rule-summary">Each function should have exactly one purpose.
+    Extract repeated code into separate functions, but do not break up a
+    function solely because of length.</div>
+  <div class="rule-details">
+    <p><i>Rationale:</i> At a high level, functions can be considered the
+      basic building blocks of programs.  Accordingly, each function should
+      do exactly one thing, and do it well; a reader should be able to look
+      at a high-level algorithm and tell what it does just by reading the
+      names of the functions it calls (see also the
+      <a href="#function-naming-rules">function naming rules</a>).  In
+      particular, a function should never have side effects which are not
+      obvious from the function's name.</p>
+    <p>Functions also enforce encapsulation of data, reducing the risk of
+      unintended interactions between separate blocks of logic and
+      increasing reusability of the code.  Any algorithm which is repeated
+      in more than one function (or more than once in the same function) is
+      a good target for extraction into a separate function.</p>
+    <p>On the flip side, breaking a function up into several subfunctions
+      forces a reader who wants to follow the code flow to jump back and
+      forth between different places in the source code, which can lead to
+      cognitive overload.  For this reason, SIL style does not enforce a
+      maximum size on functions, and instead prefers to keep code sequences
+      unique to a particular function within that function, particularly
+      when those sequences are short relative to the function as a whole.
+      In cases where this results in a particularly large function, short
+      summary comments above each block of code can help readers skimming
+      the code to understand the logic more quickly (see above regarding
+      <a href="#use-of-comments">use of comments</a>).</p>
+  </div>
+</div>
+
+<div class="rule" id="algorithm-complexity">
+  <div class="rule-title">Algorithm complexity</div>
+  <div class="rule-summary">Use an algorithm of the appropriate
+    computational complexity, but prefer simple-and-slow code to
+    fast-and-complicated code.</div>
+  <div class="rule-details">
+    <p>While you should try not to introduce unnecessary computational
+      complexity (for example, using a cubic-time algorithm when a
+      quadratic-time algorithm is available), neither should you take
+      "shortcuts" or "clever hacks" to cut down on execution time unless
+      you have hard data demonstrating that such optimizations are of
+      significant benefit to the program (or library) as a whole.</p>
+    <p><i>Rationale:</i> This rule could also be phrased as, "<b>Premature
+      optimization is the root of all evil.</b>"  The history of software
+      development is littered with cases of programmers expending effort
+      on optimizing routines which make no significant contribution to
+      execution time in the first place&mdash;and introducing new,
+      hard-to-find bugs as a result of their supposedly "clever"
+      optimizations.  Don't repeat their mistakes.</p>
+    <p><i>Examples:</i></p>
+    <div class="good code">char *make_lowercase(char *str)
+{
+    <span class="comment">/* Save the length so we don't recompute it on every loop iteration
+     * (which would take linear time per iteration, making this a
+     * quadratic-time function). */</span>
+    const size_t len = strlen(str);
+    for (size_t i = 0; i &lt; len; i++) {
+        if (str[i] >= 'A' && str[i] <= 'Z') {
+            str[i] += 'a' - 'A';
+        }
+    }
+    return str;
+}</div>
+    <div class="bad code">char *make_lowercase(char *str)
+{
+    char *old_str = str;
+    <span class="comment">/* This "optimization" attempts to reduce the number of memory loads
+     * required, but unless the sole purpose of the program is to convert
+     * strings to lowercase, this is utterly unnecessary.  Setting aside
+     * the questions of whether it actually is faster and whether the
+     * documented assumption below is valid, this code has two subtle
+     * bugs.  One, noted below, is the result of copy-and-pasting code
+     * (this was in fact a mistake made while writing this very example);
+     * it will cause every fourth byte to be improperly changed from [\]^_
+     * to {|}~&lt;DEL&gt;, and similarly for bytes in the ranges 0x80-0x9F and
+     * 0xC0-0xDF.  The other is more deadly: if the input string pointer
+     * is not aligned to a multiple of 4 bytes, the program will crash on
+     * CPUs which require aligned addresses for 32-bit integer loads. */</span>
+    const uint32_t char0_mask = 0xFF000000;
+    const uint32_t char1_mask = 0x00FF0000;
+    const uint32_t char2_mask = 0x0000FF00;
+    const uint32_t char3_mask = 0x000000FF;
+    uint32_t bits;
+    while (bits = *((uint32_t *)str),  // Assume we can overrun 1-3 bytes.
+           (bits &amp; char0_mask) &amp;&amp; (bits &amp; char1_mask) &amp;&amp;
+           (bits &amp; char2_mask) &amp;&amp; (bits &amp; char3_mask))
+    {
+        if ((bits &amp; char0_mask) &gt;= (uint32_t)'A'&lt;&lt;24
+         &amp;&amp; (bits &amp; char0_mask) &lt;= (uint32_t)'Z'&lt;&lt;24) {
+            bits |= 0x20000000;
+        }
+        if ((bits &amp; char1_mask) &gt;= (uint32_t)'A'&lt;&lt;16
+         &amp;&amp; (bits &amp; char1_mask) &lt;= (uint32_t)'Z'&lt;&lt;24) {  <span class="comment">// Oops, wrong shift!</span>
+            bits |= 0x00200000;
+        }
+        if ((bits &amp; char2_mask) &gt;= (uint32_t)'A'&lt;&lt;8
+         &amp;&amp; (bits &amp; char2_mask) &lt;= (uint32_t)'Z'&lt;&lt;8) {
+            bits |= 0x00002000;
+        }
+        if ((bits &amp; char3_mask) &gt;= (uint32_t)'A'
+         &amp;&amp; (bits &amp; char3_mask) &lt;= (uint32_t)'Z') {
+            bits |= 0x00000020;
+        }
+        *((uint32_t *)str) = bits;
+        str += 4;
+    }
+    while (*str) {
+        if (*str &gt;= 'A' &amp;&amp; *str &lt;= 'Z') {
+            *str |= 0x20;
+        }
+        str++;
+    }
+    return old_str;
+}</div>
+  </div>
+</div>
+
+<!------------------------------------------------------------------------>
+<hr/>
+
+<p class="backlink"><a href="#top">Back to top</a></p>
+
+</body>
+</html>

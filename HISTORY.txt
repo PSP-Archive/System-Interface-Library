@@ -1,0 +1,1111 @@
+SIL: System Interface Library for games -- version history
+==========================================================
+
+Version 0.5e
+------------
+Bug fixes:
+- Fixed a missing function attribute on the declaration of
+  strformat_check() which prevented the compiler from checking format
+  argument types when using that function.
+
+
+Version 0.5d
+------------
+Bug fixes:
+- Fixed an incorrect use of the "double" type in frandomf() and
+  frandomf_r().  (This bug had no effect on correctness but potentially
+  impacted performance.)
+- (Linux) Fixed an oversight in initialization code which prevented SIL
+  programs from being profiled correctly using compiler-based profilers
+  such as GCC's gprof.
+
+
+Version 0.5c
+------------
+Known bugs:
+- The mat_rotate*() functions incorrectly rotate as though for a
+  left-handed coordinate system, despite the documentation that they
+  perform right-handed rotations.  This release maintains the existing
+  behavior to avoid breaking client code, but this bug will be fixed in
+  SIL 0.6, which will require arithmetically inverting (flipping the
+  sign of) the angle argument in all mat4_rotate*() calls to preserve
+  existing behavior.
+
+New features:
+- Added input_enable_unfocused_joystick() to control whether joystick
+  events are reported while the application does not have input focus,
+  replacing the Linux-specific linux_enable_unfocused_joystick_input().
+- Added matrix utility function mat4_get_translation() to <SIL/math.h>.
+- <SIL/math.h> now guarantees that double-precision HUGE_VAL is defined.
+- (iOS) Added support for the iPhone 11 and 7th-generation (2019) iPad
+  to ios_get_model() and ios_get_display_size().
+
+Changed features:
+- Updated the libnogg, libwebmdec, and nestegg external libraries.
+- (Linux, PSP, Windows) When using the SIL build system, "make spotless"
+  no longer removes files listed in $(RESOURCES), in case any such files
+  are manually created or otherwise difficult to regenerate.  Add custom
+  rules to $(SIL_RECIPE_spotless) to automatically remove generated
+  resource files in "make spotless".
+
+Deprecated features:
+- FFmpeg support for movie playback on Linux is now deprecated due to
+  the difficulty of keeping up with the constantly changing API, and
+  will be removed in SIL 0.6 or later.  Use the built-in WebM decoder
+  instead.
+
+Bug fixes:
+- (iOS, Mac OS X) Fixed build errors when using Xcode 11.
+- (Linux) Fixed invalid return values from font_text_width() in
+  low-memory conditions when using the system font.
+- (Linux) Fixed "no time accumulated" error when running a SIL program
+  with GCC-based profiling (gprof).
+- (Windows) Fixed build errors in d3d-base.c when building in an
+  Ubuntu 18.04 environment (such as is installed by default with WSL).
+
+Miscellaneous:
+- Clarified that the non-reentrant random number functions (random32(),
+  etc.) are thread-safe in all respects other than determinism.
+
+
+Version 0.5b
+------------
+New features:
+- Added utility functions randlimit() and randrange() to <SIL/random.h>.
+- (iOS) Icons and launch images can now be specified in build variables
+  rather than requiring a custom Info.plist.  See the documentation for
+  ICON_IMAGES, ICON_ITUNES, and LAUNCH_IMAGES in build/iOS/build.mk.
+- (iOS) Added support for the iPhone XR/XS and 3rd-generation iPad Pro
+  to ios_get_model() and ios_get_display_size().
+- (iOS) The DLOG() macro now uses unified logging (os_log) when running
+  under iOS 10 or later.
+
+Changed features:
+- The non-reentrant random functions (random32(), etc.) are now declared
+  inline for improved performance.
+- Clarified that string and image data passed to userdata save functions
+  does not need to be preserved until the operation completes.
+- (iOS) Renamed the IOS_MODEL_IPAD_PRO_105 constant to
+  IOS_MODEL_IPAD_PRO_2G_10IN for naming consistency.
+
+Bug fixes:
+- Fixed link errors when calling debug UI functions from C++ code.
+- Fixed the pngtotex tool incorrectly encoding RGBA images in PVRTC
+  format when using recent versions of PVRTexToolCLI.
+- (iOS, Mac OS X) Fixed the debug UI displaying an incorrect total
+  memory size on devices with 4G or more of RAM.
+- (Linux) Fixed compilation errors with the <GL/glext.h> header
+  installed in some environments.
+- (Mac OS X) Fixed crashes when running under macOS 10.14.
+
+
+Version 0.5a
+------------
+New features:
+- Added C++ wrappers for graphics_add_vertex().
+- Added dasinf() and dacosf() to complement the other degree-unit
+  trigonometric functions.
+- Added the build option SIL_MATH_ASSUME_ROUND_TO_NEAREST to control
+  optimization of iround[f]() on x86 platforms (see below).
+- (Android) Added support for building with NDK r17 and r18.
+
+Changed features:
+- Userdata save operations now ensure that the saved data has been
+  written to persistent storage (rather than simply buffered by the
+  operating system) before returning.  This can avoid cases in which a
+  system crash immediately after a save operation leaves a file
+  containing only null bytes (because the data blocks were not flushed
+  before the crash).  This will generally cause save operations to take
+  longer than in previous versions.
+- Documented that the vec*_normalize() functions accept a zero-magnitude
+  input, returning the zero vector in that case.
+- Optimized code generation for itrunc[f]().
+- Optimized code generation for iround[f]() on x86 platforms (only
+  enabled if SIL_MATH_ASSUME_ROUND_TO_NEAREST is set).
+- (Android) Android builds now require NDK r14 or later, due to problems
+  with 64-bit ARM compilation in previous NDK versions.
+- (Android) Changed the usage of the TARGET_OS_VERSION build variable
+  to specify the minimum required version, like other systems.  The
+  variable now acts as TARGET_OS_VERSION_MIN did in previous versions
+  of SIL.  To override the value of the "targetSdkVersion" attribute
+  in the application manifest, use the new TARGET_OS_VERSION_COMPAT
+  variable.  See documentation in build/android/build.mk for details.
+- (Linux) Fixed undesired auto-minimize of windows immediately after
+  switching to fullscreen mode in a focus-follows-mouse environment.
+
+Removed features:
+- Removed the "has_path" package module method, since the standard "pkg"
+  module did not use it and the related logic was incorrect in any case.
+  Package modules will now always own the prefixes with which they are
+  registered.
+- (Android) Removed support for the armeabi-v7a-hard (ARM with register
+  passing of floating-point values) target architecture, since this has
+  not been supported since NDK r12 and is obsoleted in any case by
+  64-bit support.
+
+Bug fixes:
+- Fixed font_text_width() improperly returning the text advance value
+  rather than the rendered width.
+- Fixed text centering when the first character's left edge as rendered
+  is not aligned with the origin.
+- Fixed compilation errors when including <SIL/sound/decode.h> in a C++
+  source file.
+- Fixed compilation errors when using STATIC_ASSERT() in C++ code.
+- (Windows) Improved timeout precision in mutex_lock().
+
+Miscellaneous:
+- (iOS) Documented problems and workarounds when building for iOS 5.1.1
+  or 6.x using version 12 of the iOS SDK (Xcode 10).
+
+
+Version 0.5
+-----------
+New features (core):
+- Added support for alpha channels in framebuffers via a new color_type
+  parameter to framebuffer_create().
+- Added depth_bits and stencil_bits parameters to framebuffer_create()
+  (instead of reusing the values of the same-named display attributes).
+- Added additional parameters to graphics_clear() for the alpha, depth,
+  and stencil clear values.
+- Added graphics_clear_color() and graphics_clear_depth() to
+  independently clear color and depth buffers.
+- Added graphics_set_blend_alpha() to control separate blend factors for
+  the alpha channel of an alpha-enabled framebuffer.
+- Added graphics_make_{parallel,perspective}_projection() for generating
+  matrices to pass to shaders.
+- Added graphics_enable_debug_sync() to control explicit sync on new
+  frame for debug builds.
+- Added optional coalescing of consecutive movement-type events (call
+  input_enable_coalescing(1) to enable).
+- Added an "is_repeat" field to KeyboardInputEvent to indicate whether a
+  key-press event is a true press or a synthetic event from auto-repeat.
+- Added a "recursive" parameter to resource_list_files_start() to allow
+  recursive listing of files in subdirectories.
+- Added resource_new_texture_from_display().
+- Added sound_set_playback_rate().
+- Added strformat_append() and strformat_alloc().
+- Added thread_{set,get}_affinity() and thread_get_num_cores() to manage
+  CPU core affinity for threads.
+- Added time_get_utc(), time_get_local(), and time_is_utc_before() to
+  retrieve real-world (wall-clock) time from the system.
+- Added console_printf() to display messages such as command-line help
+  text for which display_error() is not appropriate.
+- Added STATIC_ASSERT() for compiler-independent static assertions.
+- Added FALLTHROUGH to suppress compiler fall-through warnings for
+  switch cases.
+
+New features (platform-specific):
+- (iOS) SIL now supports high-refresh-rate displays such as the iPad
+  Pro "ProMotion" display.  See README-ios.txt for details.
+- (Linux) Fullscreen windows now auto-minimize by default when using a
+  non-default video mode.
+- (Linux/Windows) Added a "fullscreen_minimize_on_focus_loss" display
+  attribute to control whether fullscreen windows are auto-minimized on
+  loss of input focus.  See README-{linux,windows}.txt for details.
+- (Linux) Added support for the input mapping scheme used for Sony
+  DualShock 4 game controllers in Linux 4.10 and later.
+- (Linux) Added TARGET_FLAGS build variable to set target architecture
+  flags for the build process (e.g., -m32 for 32-bit x86 build).
+- (Mac) Added ICON_FILE build option to automatically embed an icon in
+  the application package.
+- (Windows) SIL now supports Direct3D 11 for graphics rendering.  Call
+  graphics_set_display_attr("backend_name", "direct3d") to enable it.
+  See README-windows.txt for details.
+- (Windows) Windows are now created in a separate thread to improve
+  responsiveness to input events and allow the program to continue
+  updating the window as it is resized.  This separate thread can
+  optionally be disabled in case it confuses third-party software; see
+  the "window_thread" display attribute described in README-windows.txt.
+- (Windows) SIL now uses WASAPI for audio output on Windows Vista and
+  later, giving better audio performance.  (The WinMM, a.k.a. waveOut,
+  interface is still supported for Windows XP.)
+- (Windows) The SIL build system has been tested to work with Windows
+  Subsystem for Linux, and this is now the recommended environment for
+  building on Windows.  See README-windows.txt for details.
+
+Changes (core):
+- Calling graphics_set_depth_range() with near >= far is now explicitly
+  prohibited (it previously resulted in system-dependent behavior).
+- Renamed the graphics error codes OPENGL_NOT_FOUND and OPENGL_TOO_OLD
+  to BACKEND_NOT_FOUND and BACKEND_TOO_OLD to reflect that (on Windows)
+  a different backend may have been selected.
+- Changed graphics_set_display_mode() to avoid switching video modes if
+  the current mode has the correct resolution and the "refresh_rate"
+  attribute is set to 0 (the default), instead of switching modes just
+  to get a higher refresh rate.
+- Renamed the vertex attribute type COLOR_4UB to COLOR_4NUB for
+  consistency with custom vertex attribute types in shader objects.
+- Custom shader attributes with integer data types (1UB, 2S, 3I, etc.)
+  are now passed to shaders as integer rather than floating-point type.
+  Note that integer attributes are not supported by OpenGL/GLES 2.x
+  without the EXT_gpu_shader4 extension.
+- Documented the behavior of graphics_use_shader_objects() with respect
+  to persistent shader state.
+- graphics_start_frame() no longer performs a sync by default when
+  built with DEBUG enabled.  (The sync can still be enabled by calling
+  graphics_enable_debug_sync(1).)
+- Renamed texture_grab_new() to texture_create_from_display().
+- Documented the behavior of the texture_lock* functions when used on
+  applied textures (the texture must now be explicitly reapplied after
+  being unlocked).
+- Changed the return type of the texture_lock* functions from uint8_t *
+  to void *, since the data is not necessarily in units of bytes.
+- Documented the behavior of destroying graphics objects when they are
+  bound to render state.
+- Documented that the input_text_enable_*() functions which take string
+  parameters copy the strings before returning.
+- movie_draw() no longer automatically calls movie_update(); the caller
+  should explicitly call movie_update() before movie_draw() if desired.
+  (Calling the two functions in sequence will accomplish the same
+  synchronization of video and audio as a single call to movie_draw() in
+  previous versions of SIL.)
+- Renamed random() to random32(), and likewise for urandom(), srandom(),
+  random_r(), and urandom_r(), to avoid declaration conflicts on Linux
+  when a source file includes a system header before <SIL/base.h>.
+- The default global volume for sound output is now 1.0 (no change from
+  input level) rather than 0.5, which may result in clipping depending
+  on the level and number of simultaneous sounds played.  Use
+  sound_set_global_volume() to adjust the volume as appropriate.
+- Custom sound decoder implementations no longer need a reset method.
+  (This method was never actually called, so it has been removed.)
+- The game_title parameter of userdata_set_program_name() has been moved
+  to a separate function, userdata_set_program_title().
+- The mouse and touch methods to open the debug interface (see
+  <SIL/debug.h>) are now disabled by default.  Call the new function
+  debug_interface_enable_auto() with a true argument to enable them.
+- The UNREACHABLE macro used to indicate unreachable code locations no
+  longer takes an empty pair of parenthreses.
+- Updated libvpx to version 1.6.1.
+
+Changes (platform-specific):
+- (Android) SIL no longer supports building with GCC, since support for
+  GCC in the Android NDK has been deprecated by Google.
+- (Linux) The number keys on the top row of the keyboard (1-9 and 0) are
+  now always mapped to KEY_1 through KEY_0, even on layouts such as
+  AZERTY which have different symbols on the unshifted keys, to better
+  match user expectations.
+- (Linux) Added a workaround for dropped keyboard/mouse events during
+  window resize or fullscreen toggle; graphics_set_display_mode() now
+  generates key and mouse button release events for all keys and buttons
+  pressed at the time of the call.
+- (Mac) Fullscreen windows now use native fullscreen mode ("Spaces") if
+  the window is resizable.
+- (OpenGL platforms) Matrix-type shader uniforms are now passed in
+  row-major format (matching the description in <SIL/graphics.h> and the
+  behavior of other SIL functions) instead of column-major format.
+- (PSP) psp_vram_alloc() now takes a second parameter specifying the
+  desired alignment.
+
+Bug fixes:
+- Fixed incorrect documentation for graphics_read_pixels() (the x and y
+  parameters give the lower-left corner, not the upper-left corner).
+- Fixed a compliance issue with the C99 standard.
+- (Linux) Fixed inability to enter text through the XIM interface.
+- (Mac) Fixed various bugs in setting and returning from non-default
+  display modes.
+- (Mac) Fixed occasional crashes with text input active.
+- (Mac) Fixed windows getting placed in the lower-left corner of the
+  screen when switching out of fullscreen mode.
+- (Mac) Worked around an apparent bug in OS X 10.7 which prevented the
+  mouse pointer from being hidden.
+- (Mac) Worked around a bug in the Steam client causing screenshots
+  taken through the Steam interface to be corrupted.
+- (Mac) Fixed failure to use the native output sampling rate when
+  playing audio.
+- (Mac) Fixed a potential deadlock on exit.
+- (PSP) Fixed upside-down pixel data when reading from framebuffers.
+- (Windows) Fixed vsync display attribute not taking effect.
+- (Windows) Fixed failure to restore original display mode when a
+  fullscreen window in a non-default mode loses focus.
+- (Windows) Fixed inability to enter characters outside the ISO-8859-1
+  character set using the text input interface.
+- (Windows) Pressing and releasing the Alt key no longer causes the
+  window to lose focus.
+- (Windows) Added a workaround for graphics drivers which freeze the
+  system during video mode enumeration.
+- (Windows) Worked around bugs in some drivers and third-party programs
+  which caused display corruption or prevented video capture due to
+  invalid assumptions about WGL calling patterns.
+- (Windows) Worked around a bug in the Steam client causing SIL programs
+  to hang on startup if a game controller is connected to the system.
+
+Removed features:
+- Removed graphics_set_line_width() and graphics_max_line_width(), since
+  wide lines are either deprecated or unsupported by current renderers.
+  Render wide lines by drawing a quad of the appropriate size.  (QUAD
+  and QUAD_STRIP primitives will continue to be supported, though most
+  current renderers break them down into triangles.)
+- Removed shader_supported(), since all SIL platforms other than PSP can
+  use shaders unconditionally.
+- Removed normalized 32-bit integer vertex attribute types (ATTRIB_1NI,
+  2NI, 3NI, and 4NI) since they serve little practical purpose.
+- Removed texture_grab().  Texture grabbing can now only be done by
+  creating a new texture with texture_create_from_display().
+- Removed the direct_render parameter to movie_open(); movies are now
+  always rendered to a texture (though movie_draw() can still be used
+  to draw that texture to the display).  Direct rendering is still
+  available on the PSP via the new function psp_movie_open_direct().
+- Removed thread_create_with_stack_size() in favor of
+  thread_create_with_attr(), which also supports initial affinity.
+- Removed the oggtomp3 and oggtowav tools as irrelevant since SIL
+  supports Ogg Vorbis files natively.
+- (Linux, Windows) OpenGL 2.0 support is now mandatory; drivers which
+  implement only the fixed-function pipeline are no longer supported.
+- (PSP) Removed psp_movie_set_direct_audio(); its functionality has been
+  subsumed into psp_movie_open_direct().
+- (Windows) mingw32 is no longer supported for building.  Use the more
+  up-to-date mingw-w64 toolchain (which can also build 32-bit binaries).
+
+
+Version 0.4g
+------------
+New features:
+- (iOS) Added detection of new iPhone/iPad devices in ios_get_model().
+
+Bug fixes:
+- (iOS) Fixed a crash when receiving achievement status from Game Center
+  and some userdata statistics entries do not have a system ID set.
+
+Miscellaneous:
+- Documented that the texture returned by movie_get_texture() is not
+  initialized until the first movie_update() call.
+
+
+Version 0.4f
+------------
+Changes:
+- Updated libnogg to version 1.10.
+
+Bug fixes:
+- Reverted an incorrect change to the prototypes of random() and related
+  functions in version 0.4e.
+- Fixed incompatibilities with some shells in commands executed by the
+  build system.
+- Fixed various compiler warnings.
+- (Windows) Fixed a crash due to unaligned data in 64-bit debug builds.
+
+
+Version 0.4e
+------------
+New features:
+- (iOS) Added detection of the iPhone SE in ios_get_model().
+
+Changes:
+- Updated libpng to version 1.6.29.
+- Updated zlib to version 1.2.11.
+- (iOS) Executables built with the SIL build system now default to
+  requiring iOS 8.0 or later, which is the earliest version of iOS still
+  officially supported by Xcode 8.  It is still possible to target any
+  iOS version 5.1.1 or later, but see README-ios.txt for a caveat when
+  targeting iOS 5.1.1 and building with Xcode 8.
+- (iOS, Mac OS X) Fixed build issues with Xcode 8.
+
+Bug fixes:
+- Fixed incorrect handling of deadlines in sys_file_read_async() on
+  POSIX-based platforms.
+- Fixed C++ compilation errors when using GCC 6.
+- Fixed compliance issues with the C99 standard.
+
+
+Version 0.4d
+------------
+New features:
+- (Android) Fixed build errors with NDK r13.
+- (iOS) Added detection of iPhone 7 and iPad Pro 9.7" devices in
+  ios_get_model().
+- (iOS) Fixed inaccurate return values for iPad devices in
+  ios_get_display_size(): 7 -> 7.9, 10 -> 9.7, 12 -> 12.9.
+- (iOS) Added an EMBED_BITCODE build setting to allow embedding LLVM
+  bitcode (required for Apple TV apps submitted to the App Store).  The
+  setting is off by default.
+- (iOS) Added a WHITE_POINT_STYLE build setting to control the value of
+  the Info.plist UIWhitePointAdaptivityStyle key added in iOS 9.3.  The
+  default is not to include the key in the Info.plist file.
+
+
+Version 0.4c
+------------
+New features:
+- Added graphics_set_no_blend() as a semantically clearer equivalent to
+  graphics_set_blend(GRAPHICS_BLEND_ADD, 1, 0).
+- (Android) Added android_request_permissions() to support requesting
+  external storage access in Android 6.0.
+- (Android) Added android_external_mount_point() to provide a
+  device-independent way to get the "/sdcard" device path.
+- (Android) Version r11 of the NDK is now supported.
+
+Changes:
+- Changed memory barriers (the BARRIER() macro) to use a slightly
+  faster instruction sequence on x86 processors.
+- (Android) SDK version 23 is now required for building.
+- (PSP) Newly-created textures with data not in a PSP-specific format
+  whose width is a multiple of 16 bytes and height is a multiple of 8
+  are now swizzled on creation for faster rendering, at the cost of
+  additional CPU overhead to de-swizzle the texture if it is later
+  modified via a writable lock.  (To avoid this overhead for textures
+  which are intended to be modified at runtime, create the texture
+  without data and load the initial data with texture_lock_writeonly().)
+- (PSP) The "readable" parameter to texture_grab() and
+  texture_grab_new() is now honored; passing readable = 0 will cause the
+  resulting texture to be swizzled for faster rendering.
+- (PSP) Improved performance when locking 8bpp textures.
+
+Bug fixes:
+- Fixed crash in shader_pipeline_apply(0) on OpenGL systems without
+  separate shader object support.
+- Fixed inability to create alpha and luminance textures on OpenGL 2.x
+  platforms (regression introduced in version 0.4).
+- Added missing declaration of glFlush() in dynamic OpenGL symbol table.
+  Thanks to Matthew Gambrell for reporting the bug.
+- Fixed missing "log overflowed" message when more test failures have
+  occurred than fit in the log buffer.
+- (Windows) Fixed resource leak in graphics_finish_frame().  Thanks to
+  Matthew Gambrell for reporting the bug.
+- (Windows) Fixed various compilation errors with Visual Studio.  Thanks
+  to Matthew Gambrell for reporting the bugs.
+
+Miscellaneous:
+- Added general documentation on shader objects in <SIL/shader.h>.
+- Added explicit notes in <SIL/framebuffer.h> and <SIL/graphics.h>
+  regarding the lack of support for alpha channels in framebuffers.
+
+
+Version 0.4b
+------------
+Changes:
+- Streaming sound reads are now given higher priority than other read
+  operations, to avoid data starvation when many resources are being
+  loaded.
+- (Windows) The condvar_*() functions now use native condition variables
+  on Windows Vista and later Windows versions for better performance.
+- (Windows) Read operation scheduling is no longer delegated to the OS.
+
+Bug fixes:
+- Fixed a case in which resource links could trigger resource_sync()
+  failures or resource_wait() delays despite having been created after
+  the associated synchronization mark.
+- (Android, iOS, Linux, Mac OS X) Asynchronous read operations and
+  resource load operations no longer block if other data is being read
+  into memory at the same time.  (This was caused by the file I/O thread
+  holding the request table lock for the entire duration of a read, so
+  the rate at which other threads could submit new read requests was
+  limited by the rate at which the I/O thread completed existing
+  requests.)
+- (Windows) Added a workaround for an Intel OpenGL driver bug which
+  causes incorrect shaders to be used for rendering in some cases.
+
+Miscellaneous:
+- The <SIL/base.h> header now includes <errno.h>, so callers of
+  functions such as strtol() no longer need to include it themselves.
+- Documented that functions which delay the calling thread for a period
+  of time (time_delay(), mutex_lock_timeout(), etc.) may not delay for
+  exactly the requested period.
+- Removed an incorrect comment in src/sysdep/misc/joystick-db.txt (the
+  generic joystick device database).
+
+
+Version 0.4a
+------------
+Changes:
+- resource_destroy() now explicitly accepts NULL and no longer logs a
+  warning message when passed NULL.
+
+Bug fixes:
+- Fixed UINT32 and UINT32_MAX user stats getting reset to zero (or
+  causing an abort in debug builds) if the value was 2^31 or greater.
+- (Linux) Fixed wrong window size when switching from windowed to
+  fullscreen mode without changing the display resolution.
+- (Linux) Fixed failure to switch back to the original video mode when
+  changing from fullscreen to windowed mode.
+- (Linux) Added a workaround for lost mouse motion events after an
+  input_mouse_set_position() call (which caused SIL to stop reporting
+  mouse input).
+- (Linux, Mac OS X) Fixed failure to recreate shaders after a display
+  mode change when using the automatic shader generator.
+- (Linux, Mac OS X, Windows) Fixed unstable behavior when deleting
+  graphics objects (textures, primitives, etc.) after a display mode
+  change which caused a loss of state.
+- (Linux, Mac OS X, Windows) Fixed graphics_read_pixels() and
+  texture_grab{,_new}() reading from the wrong part of the default
+  framebuffer after changing the window size.
+- (Windows) Inactive display devices are no longer included in the set
+  of displays reported by SIL.
+
+Miscellaneous:
+- graphics_set_display_attr() is no longer documented as leaving the
+  display in an undefined state.  (This simply corrects the description
+  of existing behavior and is not a change from previous versions.)
+- In the test suite, the test for parsing a a maximum-size PNG image
+  (which can take several minutes to run) can now be skipped by setting
+  the environment variable SIL_TEST_SKIP_PNG_MAX_SIZE to 1.
+
+
+Version 0.4
+-----------
+New features (core):
+- Added support for display mode refresh rates via the "refresh_rate"
+  display attribute and a new field in the data structure returned by
+  graphics_list_display_modes() (formerly graphics_list_display_sizes();
+  see below) which indicates the refresh rate of each display mode.
+- Added support for multiple display devices (such as a multi-monitor
+  PC configuration) via the "device" display attribute and new fields in
+  the graphics_list_display_modes() return structure which indicate the
+  display device associated with each mode.
+- Added two interfaces through which client code can install custom
+  shaders for graphics rendering: graphics_set_shader_generator() and
+  related functions allow the use of custom generator functions
+  (replacing the private OpenGL interface opengl_set_shader_callbacks()
+  present in SIL version 0.3), while graphics_use_shader_objects() and
+  the shader_*() functions place shaders fully under the control of
+  client code.
+- Added the graphics_draw_primitive_partial() function.
+- Added support for multiple texture units via a new "unit" parameter to
+  texture_apply(), for use in custom shaders.
+- Added INPUT_JOYSTICK_CONNECTED and INPUT_JOYSTICK_DISCONNECTED events.
+- Added the input_key_modifier_state() function as well as a "modifiers"
+  field in keyboard input events.
+- Added the sound_get_latency() and sound_set_latency() functions.
+- Added support for loop points stored in file headers for RIFF WAVE and
+  Ogg Vorbis sound objects.
+- Added the thread_exit(), thread_get_id() and thread_get_priority()
+  functions for thread manipulation.
+- Added condition variables (the condvar_*() functions).
+- Added vector interpolation functions (vec[234]_lerp()).
+- Added translate/rotate/scale convenience functions for operating on
+  coordinate transformation matrices (mat4_translate(), mat4_rotate(),
+  mat4_rotate_[xyz](), mat4_scale()).
+
+New features (platform-specific):
+- Android: Added support for targeting 64-bit architectures (arm64-v8a,
+  mips64, and x86_64).  The default is now to build for both 32- and
+  64-bit architectures.
+- iOS: Added support for Apple's new tvOS (used in the 4th-generation
+  Apple TV), treating it as a variant of iOS.
+- iOS: Added support for game controller input.
+- Linux: Added support for touch input (requires the XInput 2.2 X11
+  extension at runtime, present in the X.org server version 1.12 and
+  later).
+- PSP: A PNG file can now be specified to be used directly as the
+  ICON0.PNG image, instead of requiring Netpbm to extract image data
+  from the source image.  For the image extraction method, the variables
+  controlling the extraction coordinates have been renamed from ICON0_*
+  to ICON0_SOURCE_*.
+- Windows: Added support for touch input on Windows 8 and later.
+- Windows: Added support for targeting the 64-bit x86 architecture by
+  setting TARGET_ARCH_ABI=amd64 (the default is x86, for 32-bit builds).
+- Windows: Built executables now include an application manifest.
+  Accordingly, the program's Makefile should set PACKAGE_NAME and
+  PROGRAM_VERSION_CODE before including build/windows/build.mk.
+
+Changed features (core - graphics):
+- Graphics display "sizes" are now referred to as "modes":
+     - Renamed the function graphics_list_display_sizes() to
+       graphics_list_display_modes(), and added a parameter indicating
+       whether to consider refresh rates when returning the mode list.
+     - Renamed the GraphicsDisplaySizeList structure to
+       GraphicsDisplayModeList, and gave a name
+       (GraphicsDisplayModeEntry) to the internal structure describing
+       individual display modes.
+- Added the error_ret parameter to graphics_set_display_mode() to
+  provide a more specific error code on failure.
+- Moved framebuffer management functions from the <SIL/graphics.h>
+  header to a separate <SIL/framebuffer.h> header and renamed them to
+  framebuffer_*(); for example, graphics_create_framebuffer() is now
+  framebuffer_create().  See <SIL/framebuffer.h> for details.
+- Replaced the graphics_apply_framebuffer() function with
+  framebuffer_get_texture(), which returns a texture ID that can be
+  passed to texture_apply().
+- Renamed the GraphicsPrimitiveID and GraphicsVertexDataID types to
+  GraphicsPrimitiveType and GraphicsVertexFormatType, respectively.
+- graphics_set_perspective_projection() now takes a flag indicating
+  whether a right-handed or left-handed coordinate system is in use.
+- Renamed the functions font_charwidth() and font_textwidth() to
+  font_char_advance() and font_text_width(), respectively.
+- Added a smooth_chroma parameter to movie_open(), allowing linear
+  interpolation for chroma upsampling in movie playback (formerly
+  controlled by the SIL_UTILITY_YUV2RGB_SMOOTH_UV build setting, which
+  has been removed) to be set on a per-instance basis.
+
+Changed features (core - input):
+- Renamed the key code KEY_NUMPAD_DOT to KEY_NUMPAD_DECIMAL.
+- The scroll amount in mouse scroll events is now a floating-point
+  rather than integer value, and it can take on non-integral values if
+  the system supports such values (currently Android and Windows).
+- Renamed the "show" and "hide" text input functions (input_text_show(),
+  input_text_show_with_default_text(), input_text_show_with_prompt(),
+  and input_text_hide()) to "enable" and "disable" respectively
+  (input_text_enable_with_prompt(), etc).
+
+Changed features (core - sound):
+- Sound functions can now safely be called even if sound_open_device()
+  fails (they do nothing in that case).
+- sound_open_device() now always allocates the requested number of
+  channels, and returns a simple boolean result (success or failure)
+  rather than the number of allocated channels.
+- Removed loop point parameters from sound_create() and
+  sound_create_stream(), since the intended usage is now to store loop
+  information in file headers.  sound_set_loop() can still be used to
+  explicitly set loop points for a Sound object.
+- Replaced the SIL_SOUND_HEADPHONE_CHECK build setting with the function
+  sound_enable_headphone_disconnect_check().
+- SIL now uses libnogg instead of libvorbis or Tremor for improved
+  performance in Ogg Vorbis audio decoding.
+
+Changed features (core - user data):
+- Changed the interface for accessing per-user statistics (the
+  userdata_*_stats() functions): individual values are now set and
+  queried directly rather than by passing arrays of IDs and values, and
+  separate ID strings can be associated with individual statistics for
+  use with system-level achievements or similar external APIs.
+- userdata_save_savefile() and similar functions no longer overwrite
+  files which the user has marked unwritable (such as with "chmod -w" on
+  Linux and Mac OS X).
+
+Changed features (core - miscellaneous):
+- The vector functions (vec2_add() and so forth) now take and return
+  vectors by value rather than by reference, to reduce the clutter of
+  temporary variables needed in vector computations.  This has no impact
+  on perforamnce, since the functions are all inlined.  Matrix functions
+  still pass data by reference since some functions (notably mat4_mul())
+  are defined out-of-line to avoid code size bloat and instruction cache
+  thrashing.
+- mutex_create() now takes a MutexType parameter specifying whether the
+  mutex should be recursive or not.
+- The strformat() "+" modifier now defaults to the standard behavior of
+  prefixing signed numeric conversions with a "+".  Client code must
+  explicitly call strformat_enable_fullwidth(1) (and, if appropriate,
+  strformat_set_fullwidth(1)) to obtain the behavior of previous SIL
+  versions.
+- thread_create_with_priority() and thread_create_with_stack_size() now
+  take "absolute" priority values (relative to the program's initial
+  thread) rather than values relative to the current thread.  The old
+  behavior can be obtained by adding the relative priority value to the
+  value returned from the new thread_get_priority() function.
+- Debug logging to a file is now controlled by the new log_to_file()
+  function; the build option SIL_DLOG_LOG_FILE has been removed.  The
+  file will still receive all log messages written since program startup
+  as long as log_to_file() is called reasonably early in sil_main().
+  (On Linux, Mac OS X, and Windows, userdata_set_program_name() must
+  also be called before the log file can be created.)
+- Added the build setting SIL_LINK_CXX_STL to control whether the C++
+  STL (e.g. libstdc++) is linked into the final executable.  The default
+  is to not link the STL, which differs from earlier versions of SIL.
+
+Changed features (platform-specific):
+- OpenGL platforms (Android, iOS, Linux, Mac OS X, Windows): Alpha-only
+  textures are now loaded as single-component (GL_RED) textures rather
+  than full RGBA textures on OpenGL/GLES 3.0 and later, reducing memory
+  requirements by a factor of 4 for such textures.
+- Android: Builds now require version 21 of the Android SDK, version 19
+  of the build-tools and platform-tools SDK packages, and version 10e of
+  the Android NDK.
+- Android: When building for Android, the root directory of the Android
+  SDK installation should now be specified in the ANDROID_HOME variable;
+  version 0.3's ANDROID_ROOT is no longer supported.
+- iOS: iOS versions earlier than 5.1.1 are no longer supported (due to a
+  lack of devices to test with).
+- Linux: input_grab() no longer blocks window manager keyboard controls
+  such as Alt-Tab.
+- Linux: Added linux_enable_unfocused_joystick_input() to set whether to
+  receive joystick input while the window does not have input focus.
+- Linux, Mac OS X, Windows: Builds no longer require or use SDL.
+- Linux, Mac OS X, Windows: Analog joystick input is now automatically
+  mapped to logical sticks for input_joystick_read_stick(), so stick
+  index 0 is always the left analog stick and index 1 is always the right
+  analog stick on a standard gamepad.  Code which used separate calls to
+  read X and Y values from raw "axis" inputs will no longer work.
+- Mac OS X: Builds now require Xcode 4.5 or later due to problems with
+  compilers included in earlier releases of Xcode.
+- PSP: The USE_STDCXX build setting option has been removed in favor of
+  the new platform-independent SIL_LINK_CXX_STL setting (which does the
+  same thing).
+- Windows: Quoted command line arguments are now parsed properly.
+- Windows: Builds no longer require or use OpenAL.
+
+Removed features:
+- Removed the "preserve_state" display attribute; client code is now
+  responsible for recreating graphics resources if necessary after a
+  display mode change.  graphics_set_display_mode() now returns the
+  error code GRAPHICS_ERROR_STATE_LOST to indicate that the caller needs
+  to recreate resources.
+- Removed the texture_import() function, since there was no API through
+  which to obtain SysTexture objects to pass to it.
+- iOS, Mac OS X: Removed support for H.264 movie playback through the
+  system frameworks due to inconsistent, unpredictable, and generally
+  buggy behavior.  Movie playback now requires the software WebM decoder
+  on these platforms.
+
+Bug fixes:
+- Fixed incorrect fog processing with some transformation matrices when
+  using OpenGL shaders.
+- Fixed thread-unsafe error handling behavior in PNG image handling.
+- Fixed handling of RIFF WAVE sound files with odd-sized chunks.
+
+Miscellaneous:
+- time_now() is now documented to always return nonnegative values.
+  (This simply documents existing behavior and is not a change from
+  previous versions.)
+
+
+Version 0.3m
+------------
+Changes:
+- Fixed iOS build issues with Xcode 8.
+
+
+Version 0.3l
+------------
+Bug fixes:
+- Fixed a rare case in which frandom() and frandomf() could return
+  exactly 1.0, violating the constraint that the functions always return
+  a value less than 1.0.
+
+
+Version 0.3k
+------------
+Bug fixes:
+- Fixed a bug triggered by workqueue_wait_all() which could cause
+  subsequent calls to workqueue_wait_all() to fail to wait.
+- Fixed incorrect floating-point precision in strformat("%g") processing
+  which could produce output in the wrong format for values near 0.0001
+  when running on the PSP.
+
+
+Version 0.3j
+------------
+New features:
+- Android builds now check the variable ANDROID_HOME as well as
+  ANDROID_ROOT for the Android SDK installation path, to match the
+  behavior of the Android SDK Java-based build scripts.  Note that in
+  SIL 0.4, only ANDROID_HOME will be supported.
+- Added support for signing Android applications with Java 7.
+  (Previously, applications signed with Java 7 would fail to load on
+  Gingerbread devices due to a change in the default signing algorithm.)
+- Mac OS X and iOS builds now honor the "active developer directory"
+  reported by the xcode-select tool if no explicit path (XCODE_APP or
+  XCODE_ROOT) is set in the environment or on the build command line.
+
+Bug fixes:
+- Fixed the Android system navigation bar not being hidden by default.
+- Added a workaround for Android 2.3 (Gingerbread) failing to detect a
+  thread attempting to wait on itself.
+
+
+Version 0.3i
+------------
+New features:
+- iOS builds can now target the 64-bit ARM architecture (by setting
+  TARGET_ARCH_ABI=arm64) and can create "fat" binaries containing both
+  32-bit and 64-bit code (with TARGET_ARCH_ABI=all).  The default is
+  TARGET_ARCH_ABI=all, as is currently required for submission to the
+  App Store.
+- SIL now handles the iOS "media services were reset" condition, a very
+  rare occurrence which causes loss of audio playback if not handled.
+
+Changed features:
+- Android builds now require SDK version 19 _exactly_ (not any later
+  version) due to backward-compatibility bugs in newer SDK versions.
+  SIL 0.4 will accept newer SDK versions.
+- iOS builds now require iOS 5.1.1 or later by default.  Note that "fat"
+  binaries require iOS 5.1.1 or later, and the build system will not
+  warn if TARGET_OS_VERSION is set to a lower version.
+
+Bug fixes:
+- Fixed time_delay() sometimes returning immediately on iOS.
+- Fixed incorrect truncation of trailing zeroes for the %g token in
+  strformat().
+- Fixed incorrect output from strformat() for the "hh" modifier on
+  Android.
+
+
+Version 0.3h
+------------
+Bug fixes:
+- On iOS, sound_open_device() no longer fails if the system returns a
+  different I/O buffer size than requested (though it is unclear whether
+  this can happen in practice).
+- Fixed workaround for spurious iOS headphone-disconnect notifications.
+
+
+Version 0.3g
+------------
+Bug fixes:
+- Fixed incorrect view size on iOS 8.0+ when built against iOS SDK 8.0+
+  (manifesting as stretched or clipped graphics).
+- Fixed incorrect return value from ios_status_bar_visible_height() on
+  iOS 8.0+ when built against iOS SDK 8.0+.
+
+Miscellaneous:
+- ios_get_model() now recognizes the iPhone 6 and 6+.
+
+
+Version 0.3f
+------------
+New features:
+- The strformat() family of functions now accepts the %e, %E, %F, and %G
+  tokens and the " " (space), "h", "hh", and "L" modifiers, and the %g
+  token now functions as defined by the C99 standard.
+- Added strformat_enable_fullwidth() to explicitly enable or disable the
+  fullwidth-conversion behavior of the strformat() "+" modifier.  The
+  default behavior is unchanged from previous versions of SIL.
+
+Bug fixes:
+- Fixed failure to recognize Control and Meta keys on Android when using
+  a physical keyboard.
+
+
+Version 0.3e
+------------
+New features:
+- The build system now aborts the build immediately if the selected
+  compiler is known not to be able to build SIL.  Currently, this means
+  GCC versions prior to 4.3 are disallowed due to insufficient C99
+  support.
+
+Bug fixes:
+- Fixed various build errors with old versions of GCC.
+- Fixed errors building tool programs in some Windows environments.
+- The build-pkg tool no longer aborts if the path prefix of a wildcard
+  pattern specifies a directory that does not exist or if a wildcard
+  matches a directory.
+
+
+
+Version 0.3d
+------------
+Bug fixes:
+- Linux builds now properly use sdl-config (or sdl2-config) to find the
+  SDL compiler and linker flags.
+- Fixed incorrect value of _POSIX_C_SOURCE in build.mk on POSIX systems.
+
+
+Version 0.3c
+------------
+New features:
+- Arbitrary tags can now be added to the Android manifest file by
+  setting appropriate Makefile variables (see build/android/build.mk
+  for details).
+
+Bug fixes:
+- Fixed inability to load resources on some 32-bit platforms if DEBUG
+  was not defined.
+- Fixed a possible crash if a negative value was specified for the loop
+  start point when creating a Sound object.
+- Fixed a bug in the Tremor library which could cause reading past the
+  end of an Ogg Vorbis stream.
+- Fixed MP3 sounds only looping once on the PSP.
+- Fixed incorrect vertical position of text rendered using the Android
+  system font.
+- The build system no longer tries to link code coverage libraries when
+  coverage analysis is not enabled.
+- Fixed various build errors when using the Clang toolchain.
+- Fixed a build error on Linux with USE_FFMPEG=1 when building against
+  FFmpeg 2.2.x.
+- Fixed a build error on the PSP with SIL_MEMORY_FORBID_MALLOC defined
+  and DEBUG undefined.
+
+Miscellaneous:
+- Improved test coverage.
+- Cleaned up code and documentation a bit.
+
+
+Version 0.3b
+------------
+Bug fixes:
+- Fixed a typo causing "make help" to abort for Android builds.
+
+
+Version 0.3a
+------------
+New features:
+- Added the sound_enable_loop() function.
+- Added the iOS-specific ios_sound_set_category() function.
+
+Changed features:
+- Headphone disconnect checking can now be toggled on or off at build
+  time using the SIL_SOUND_HEADPHONE_CHECK build setting.  The default
+  is off, so that programs which do not explicitly implement headphone
+  disconnect checking do not get unexpected behavior (sound cutting out
+  when headphones are disconnected).
+- iOS builds now require iOS 5.0 or newer; iOS 4.3 is no longer
+  supported (due to a lack of devices to test with).
+- The utility/png.h and sysdep/psp/lalloc.h headers are now public.
+
+Bug fixes:
+- Fixed a deadlock on Android if the program was performing a system
+  font operation at the instant the program is suspended.
+- Fixed an audio glitch when looping MP3 audio streams on the PSP.
+- Fixed a bug in MP3 audio playback on the PSP which caused the
+  sound_playback_pos() function to return incorrect values after
+  looping.
+
+
+Version 0.3
+-----------
+New features:
+- SIL now provides public headers in the include/SIL directory.  Client
+  code should, when possible, use these headers rather than including
+  headers directly from the SIL source (in src/), as internal interfaces
+  are subject to frequent change.
+- SIL now takes care of initializing all internal subsystems before
+  calling the client code's entry point, so there is no longer any need
+  for client code to call functions like graphics_init() and
+  graphics_cleanup().
+- TrueType fonts are now supported via the FreeType library (this
+  support can be optionally disabled).
+- The graphics subsystem now supports stencil buffers.
+- All four ordered relational operations (<, <=, >=, >) are now
+  supported for depth and alpha testing.
+- Input processing now includes an event callback interface.
+- Movie playback is now supported on all systems.
+- Resource management now includes a resource_create() function to
+  dynamically allocate a ResourceManager instance, and static instances
+  no longer need to be explicitly initialized.
+- Raw file access is now possible through resource_open_file() and
+  related functions.
+- A pseudorandom number generator has been added (random() and related
+  functions, declared in <SIL/random.h>), allowing client programs to
+  obtain a good-quality pseudorandom number sequence which is consistent
+  for a given seed value regardless of platform.
+- Thread and synchronization primitives, which were previously available
+  only as private low-level functions, are now exported as public
+  interfaces.  A work queue implementation has also been added to
+  simplify the task of performing asynchronous processing.
+- Android device information is now exported through the functions
+  android_get_X(), where "X" is "hardware", "manufacturer", "model", or
+  "product".
+
+Changed features:
+- graphics_set_window_icon() now takes a texture instead of a
+  platform-dependent data pointer.
+- The graphics render state functions have been changed from a small set
+  of functions taking a parameter ID argument (graphics_set_matrix(),
+  graphics_set_render_param(), and so on) to a large set of functions
+  each dedicated to a single parameter (graphics_set_view_matrix(),
+  graphics_set_fixed_color(), and so on).
+- C++ wrappers using constant references have been added for most
+  functions which take input vector or matrix pointer arguments, so that
+  C++ code can call those functions without having to create a separate
+  temporary variable.
+- Text input now supports delete-forward and cursor movement actions.
+- Key code definitions have been moved to the header <SIL/keycodes.h>,
+  which must now be included independently from <SIL/input.h>.
+- The declarations of random(), frandom(), and frandomf() have been
+  moved from <SIL/base.h> to <SIL/random.h>.
+
+Miscellaneous:
+- SIL now includes source code for most of the external libraries it
+  uses under the external/ directory.  By default, SIL will build these
+  sources directly instead of requiring the libraries to be installed on
+  the build host.
+
+
+Version 0.2h
+------------
+Miscellaneous:
+- SIL no longer requires the WAKE_LOCK permission on Android devices.
+- Added a workaround for an Android bug which could prevent installation
+  if the device's external storage was corrupt.
+
+
+Version 0.2g
+------------
+Bug fixes:
+- Fixed a bug in matrix uniform handling for OpenGL shaders which caused
+  rendering to break on iOS when built with Xcode 5.0 or later.
+- Fixed a memory leak in iOS system font rendering.
+- Fixed potential crashes in iOS system font rendering under low memory
+  conditions.
+
+Miscellaneous:
+- Adjusted iOS OpenGL parameters to improve performance with current
+  versions of iOS.
+- Updated Android and iOS build scripts to work with Android SDK r22 /
+  NDK r9b and Xcode 5.0.
+- Updated pngtotex tool to work with more recent versions of the
+  PVRTexTool command-line program (PVRTexToolCLI).
+
+
+Version 0.2f
+------------
+Bug fixes:
+- Failure reading pixel data from a save file screenshot texture will no
+  longer cause the save operation itself to fail.
+- Fixed building on Linux with FFmpeg 1.2.
+
+
+Version 0.2e
+------------
+Bug fixes:
+- Fixed an internal I/O resource leak which could potentially cause read
+  operations to fail after repeatedly stopping sounds during playback.
+
+
+Version 0.2d
+------------
+Changed features:
+- Improved autodetection of right stick inputs for two-stick gamepads.
+
+
+Version 0.2c
+------------
+Bug fixes:
+- Fixed mis-sized display on iOS 6.
+- Fixed building with Clang on Linux.
+
+
+Version 0.2b
+------------
+Bug fixes:
+- Fixed failure to autorotate on iOS when building with the iOS 6 SDK.
+- Worked around a crash in the iOS OpenGL libraries which manifests if
+  certain graphics operations are performed before a texture is applied
+  for the first time.
+- Fixed a deadlock on Android when trying to display a dialog if a fatal
+  error (such as missing data files) is detected at startup.
+- Fixed a spurious test failure when running under Valgrind.
+- Fixed uninitialized memory accesses on Linux when playing short (<5MB)
+  movie files.
+
+
+Version 0.2a
+-----------
+New features:
+- The system mouse pointer on PC platforms can now be enabled.
+
+Bug fixes:
+- Fixed a crash on Android when a game controller is unplugged while the
+  program is suspended.
+- Fixed a bug causing the mat4_identity constant to read as all zeros
+  when accessed from C++.
+- Fixed a C++-specific compilation error when using static resource
+  managers.
+
+
+Version 0.2
+-----------
+New features:
+- Added generic font and text primitive support.
+- Added support for rendering X11 bitmap fonts on Linux.
+- Added support for movie playback on Android, Linux, and PSP.
+
+Changed features:
+- iOS builds now use the standard rotation animation instead of
+  instantly flipping the screen when the device is rotated.
+- Improved Android support.
+
+Bug fixes:
+- Fixed failure to preserve OpenGL state when changing the window size
+  in an SDL environment (Linux, OSX, Windows).
+- Fixed an OpenGL bug in which fog changes would not be applied in some
+  cases when using shaders.
+- Worked around build failures due to broken OpenGL headers.
+- Fixed circular dependency warnings when building tests on OSX.
+
+Miscellaneous:
+- Improved test coverage.
+
+
+Version 0.1
+-----------
+First numbered version.

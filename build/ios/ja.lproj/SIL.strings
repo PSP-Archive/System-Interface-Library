@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IOS_ERROR_TITLE</key>
+	<string>エラー</string>
+	<key>IOS_FRIENDLY_ERROR_TITLE</key>
+	<string>ゴメンなさい！</string>
+	<key>IOS_PLAYERLIST_ERROR_TEXT</key>
+	<string>システムエラーが発生したため、
+プレイヤー情報を更新できませんでした。
+%sは終了します。</string>
+</dict>
+</plist>

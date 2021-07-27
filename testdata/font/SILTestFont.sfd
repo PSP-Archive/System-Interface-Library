@@ -1,0 +1,172 @@
+SplineFontDB: 3.0
+FontName: SILTestFont
+FullName: SILTestFont
+FamilyName: SILTestFont
+Weight: Medium
+Copyright: This font file is part of SIL.
+UComments: "2013-6-17: Created." 
+Version: 001.000
+ItalicAngle: 0
+UnderlinePosition: -100
+UnderlineWidth: 50
+Ascent: 800
+Descent: 200
+LayerCount: 2
+Layer: 0 0 "Back"  1
+Layer: 1 0 "Fore"  0
+NeedsXUIDChange: 1
+XUID: [1021 40 726469273 8417792]
+FSType: 0
+OS2Version: 0
+OS2_WeightWidthSlopeOnly: 0
+OS2_UseTypoMetrics: 1
+CreationTime: 1371415163
+ModificationTime: 1371497659
+PfmFamily: 17
+TTFWeight: 500
+TTFWidth: 5
+LineGap: 100
+VLineGap: 0
+OS2TypoAscent: 0
+OS2TypoAOffset: 1
+OS2TypoDescent: 0
+OS2TypoDOffset: 1
+OS2TypoLinegap: 100
+OS2WinAscent: 0
+OS2WinAOffset: 1
+OS2WinDescent: 0
+OS2WinDOffset: 1
+HheadAscent: 0
+HheadAOffset: 1
+HheadDescent: 0
+HheadDOffset: 1
+OS2Vendor: 'PfEd'
+Lookup: 258 0 0 "Kerning"  {"Kerning-1" [150,15,2] } ['kern' ('DFLT' <'dflt' > 'latn' <'dflt' > ) ]
+MarkAttachClasses: 1
+DEI: 91125
+LangName: 1033 
+Encoding: ISO8859-1
+UnicodeInterp: none
+NameList: Adobe Glyph List
+DisplaySize: -24
+AntiAlias: 1
+FitToEm: 1
+WinInfo: 16 16 4
+BeginPrivate: 0
+EndPrivate
+BeginChars: 256 6
+
+StartChar: L
+Encoding: 76 76 0
+Width: 600
+VWidth: 0
+Flags: W
+HStem: 0 100<100 500>
+VStem: 0 100<100 800>
+LayerCount: 2
+Fore
+SplineSet
+0 800 m 29
+ 100 800 l 29
+ 100 100 l 29
+ 500 100 l 29
+ 500 0 l 29
+ 0 0 l 29
+ 0 800 l 29
+EndSplineSet
+Validated: 1
+Kerns2: 4 -400 "Kerning-1" 
+EndChar
+
+StartChar: hyphen
+Encoding: 45 45 1
+Width: 550
+VWidth: 0
+Flags: W
+HStem: 300 100<100 450>
+LayerCount: 2
+Fore
+SplineSet
+100 400 m 25
+ 450 400 l 25
+ 450 300 l 29
+ 100 300 l 25
+ 100 400 l 25
+EndSplineSet
+Validated: 1
+Kerns2: 5 -450 "Kerning-1"  1 -200 "Kerning-1" 
+EndChar
+
+StartChar: j
+Encoding: 106 106 2
+Width: 300
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+100 400 m 29
+ 200 400 l 25
+ 200 -100 l 25
+ 100 -100 l 25
+ 100 400 l 29
+100 600 m 25
+ 200 600 l 25
+ 200 500 l 25
+ 100 500 l 25
+ 100 600 l 25
+EndSplineSet
+Validated: 1
+EndChar
+
+StartChar: uni00A0
+Encoding: 160 160 3
+Width: 350
+VWidth: 0
+Flags: HW
+LayerCount: 2
+EndChar
+
+StartChar: quotesingle
+Encoding: 39 39 4
+Width: 300
+VWidth: 0
+Flags: W
+HStem: 600 200<100 200>
+VStem: 100 100<600 800>
+LayerCount: 2
+Fore
+SplineSet
+100 800 m 25
+ 200 800 l 25
+ 200 600 l 25
+ 100 600 l 25
+ 100 800 l 25
+EndSplineSet
+Validated: 1
+EndChar
+
+StartChar: colon
+Encoding: 58 58 5
+Width: 300
+VWidth: 0
+Flags: W
+HStem: 100 100<100 200> 500 100<100 200>
+VStem: 100 100<100 200 500 600>
+LayerCount: 2
+Fore
+SplineSet
+100 200 m 25
+ 200 200 l 25
+ 200 100 l 25
+ 100 100 l 25
+ 100 200 l 25
+100 600 m 25
+ 200 600 l 25
+ 200 500 l 25
+ 100 500 l 25
+ 100 600 l 25
+EndSplineSet
+EndChar
+EndChars
+EndSplineFont

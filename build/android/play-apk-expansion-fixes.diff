@@ -1,0 +1,198 @@
+# This patch fixes the following issues with notifications in the Google
+# Play APK Expansion Library:
+#    - The pre-ICS notification no longer reads "100%" before the download
+#      starts.
+#    - The progress bar properly goes to 100% when the download completes.
+#    - The notification no longer shows file sizes, since the size data is
+#      arguably redundant with both the time remaining shown in the
+#      notification and the file size shown in the main view, and also to
+#      avoid differing from the values shown in the main view if the main
+#      view uses different size units (e.g. KiB or MB instead of MiB).
+#
+# Patch created by: Andrew Church <achurch@achurch.org>
+
+diff -urN play_apk_expansion-orig/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/DownloadNotification.java play_apk_expansion/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/DownloadNotification.java
+--- play_apk_expansion-orig/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/DownloadNotification.java	2013-02-06 20:17:25 +0900
++++ play_apk_expansion/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/DownloadNotification.java	2013-02-09 01:46:24 +0900
+@@ -108,6 +108,11 @@
+                     break;
+ 
+                 case IDownloaderClient.STATE_COMPLETED:
++                    if (mProgressInfo != null) {
++                        // Ensure that we actually show 100% progress.
++                        mProgressInfo.mOverallProgress = mProgressInfo.mOverallTotal;
++                    }
++                    // fall through
+                 case IDownloaderClient.STATE_PAUSED_BY_REQUEST:
+                     iconResource = android.R.drawable.stat_sys_download_done;
+                     stringDownloadID = Helpers.getDownloaderStringResourceIDFromState(newState);
+@@ -132,10 +137,17 @@
+             }
+             mCurrentText = mContext.getString(stringDownloadID);
+             mCurrentTitle = mLabel.toString();
+-            mCurrentNotification.tickerText = mLabel + ": " + mCurrentText;
+-            mCurrentNotification.icon = iconResource;
+-            mCurrentNotification.setLatestEventInfo(mContext, mCurrentTitle, mCurrentText,
+-                    mContentIntent);
++            if (mProgressInfo != null && mProgressInfo.mOverallTotal > 0) {
++                mCustomNotification.setCurrentBytes(mProgressInfo.mOverallProgress);
++                mCustomNotification.setTotalBytes(mProgressInfo.mOverallTotal);
++                mCustomNotification.setTimeRemaining(mProgressInfo.mTimeRemaining);
++            }
++            mCustomNotification.setIcon(iconResource);
++            mCustomNotification.setPendingIntent(mContentIntent);
++            mCustomNotification.setText(mCurrentText);
++            mCustomNotification.setTicker(mLabel + ": " + mCurrentText);
++            mCustomNotification.setTitle(mLabel);
++            mCurrentNotification = mCustomNotification.updateNotification(mContext);
+             if (ongoingEvent) {
+                 mCurrentNotification.flags |= Notification.FLAG_ONGOING_EVENT;
+             } else {
+@@ -152,28 +164,25 @@
+         if (null != mClientProxy) {
+             mClientProxy.onDownloadProgress(progress);
+         }
+-        if (progress.mOverallTotal <= 0) {
+-            // we just show the text
+-            mNotification.tickerText = mCurrentTitle;
+-            mNotification.icon = android.R.drawable.stat_sys_download;
+-            mNotification.setLatestEventInfo(mContext, mLabel, mCurrentText, mContentIntent);
+-            mCurrentNotification = mNotification;
+-        } else {
++        if (progress.mOverallTotal > 0) {
+             mCustomNotification.setCurrentBytes(progress.mOverallProgress);
+             mCustomNotification.setTotalBytes(progress.mOverallTotal);
+-            mCustomNotification.setIcon(android.R.drawable.stat_sys_download);
+-            mCustomNotification.setPendingIntent(mContentIntent);
+-            mCustomNotification.setTicker(mLabel + ": " + mCurrentText);
+-            mCustomNotification.setTitle(mLabel);
+             mCustomNotification.setTimeRemaining(progress.mTimeRemaining);
+-            mCurrentNotification = mCustomNotification.updateNotification(mContext);
+         }
++        mCustomNotification.setIcon(android.R.drawable.stat_sys_download);
++        mCustomNotification.setPendingIntent(mContentIntent);
++        mCustomNotification.setText(mCurrentText);
++        mCustomNotification.setTicker(mLabel + ": " + mCurrentText);
++        mCustomNotification.setTitle(mLabel);
++        mCurrentNotification = mCustomNotification.updateNotification(mContext);
+         mNotificationManager.notify(NOTIFICATION_ID, mCurrentNotification);
+     }
+ 
+     public interface ICustomNotification {
+         void setTitle(CharSequence title);
+ 
++        void setText(CharSequence text);
++
+         void setTicker(CharSequence ticker);
+ 
+         void setPendingIntent(PendingIntent mContentIntent);
+diff -urN play_apk_expansion-orig/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/V14CustomNotification.java play_apk_expansion/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/V14CustomNotification.java
+--- play_apk_expansion-orig/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/V14CustomNotification.java	2013-02-06 20:17:25 +0900
++++ play_apk_expansion/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/V14CustomNotification.java	2013-02-09 01:44:56 +0900
+@@ -26,11 +26,12 @@
+ public class V14CustomNotification implements DownloadNotification.ICustomNotification {
+ 
+     CharSequence mTitle;
++    CharSequence mText;
+     CharSequence mTicker;
+     int mIcon;
+     long mTotalKB = -1;
+     long mCurrentKB = -1;
+-    long mTimeRemaining;
++    long mTimeRemaining = -1;
+     PendingIntent mPendingIntent;
+ 
+     @Override
+@@ -44,6 +45,11 @@
+     }
+ 
+     @Override
++    public void setText(CharSequence text) {
++        mText = text;
++    }
++
++    @Override
+     public void setTotalBytes(long totalBytes) {
+         mTotalKB = totalBytes;
+     }
+@@ -66,9 +72,11 @@
+         } else {
+             builder.setProgress(0, 0, true);
+         }
+-        builder.setContentText(Helpers.getDownloadProgressString(mCurrentKB, mTotalKB));
+-        builder.setContentInfo(c.getString(R.string.time_remaining_notification,
+-                Helpers.getTimeRemaining(mTimeRemaining)));
++        builder.setContentText(mText);
++        if (mTimeRemaining >= 0) {
++            builder.setContentInfo(c.getString(R.string.time_remaining_notification,
++                    Helpers.getTimeRemaining(mTimeRemaining)));
++        }
+         if (mIcon != 0) {
+             builder.setSmallIcon(mIcon);
+         } else {
+diff -urN play_apk_expansion-orig/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/V3CustomNotification.java play_apk_expansion/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/V3CustomNotification.java
+--- play_apk_expansion-orig/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/V3CustomNotification.java	2013-02-06 20:17:25 +0900
++++ play_apk_expansion/downloader_library/src/src/com/google/android/vending/expansion/downloader/impl/V3CustomNotification.java	2013-02-09 14:38:51 +0900
+@@ -29,11 +29,12 @@
+ public class V3CustomNotification implements DownloadNotification.ICustomNotification {
+ 
+     CharSequence mTitle;
++    CharSequence mText;
+     CharSequence mTicker;
+     int mIcon;
+     long mTotalBytes = -1;
+     long mCurrentBytes = -1;
+-    long mTimeRemaining;
++    long mTimeRemaining = -1;
+     PendingIntent mPendingIntent;
+     Notification mNotification = new Notification();
+ 
+@@ -48,6 +49,11 @@
+     }
+ 
+     @Override
++    public void setText(CharSequence text) {
++        mText = text;
++    }
++
++    @Override
+     public void setTotalBytes(long totalBytes) {
+         mTotalBytes = totalBytes;
+     }
+@@ -78,20 +84,27 @@
+         expandedView.setTextViewText(R.id.title, mTitle);
+         // look at strings
+         expandedView.setViewVisibility(R.id.description, View.VISIBLE);
+-        expandedView.setTextViewText(R.id.description,
+-                Helpers.getDownloadProgressString(mCurrentBytes, mTotalBytes));
++        expandedView.setTextViewText(R.id.description, mText);
+         expandedView.setViewVisibility(R.id.progress_bar_frame, View.VISIBLE);
+         expandedView.setProgressBar(R.id.progress_bar,
+                 (int) (mTotalBytes >> 8),
+                 (int) (mCurrentBytes >> 8),
+                 mTotalBytes <= 0);
+-        expandedView.setViewVisibility(R.id.time_remaining, View.VISIBLE);
+-        expandedView.setTextViewText(
+-                R.id.time_remaining,
+-                c.getString(R.string.time_remaining_notification,
+-                        Helpers.getTimeRemaining(mTimeRemaining)));
+-        expandedView.setTextViewText(R.id.progress_text,
+-                Helpers.getDownloadProgressPercent(mCurrentBytes, mTotalBytes));
++        if (mTimeRemaining >= 0) {
++            expandedView.setViewVisibility(R.id.time_remaining, View.VISIBLE);
++            expandedView.setTextViewText(
++                    R.id.time_remaining,
++                    c.getString(R.string.time_remaining_notification,
++                            Helpers.getTimeRemaining(mTimeRemaining)));
++        } else {
++            expandedView.setViewVisibility(R.id.time_remaining, View.GONE);
++        }
++        if (mTotalBytes > 0) {
++            expandedView.setTextViewText(R.id.progress_text,
++                    Helpers.getDownloadProgressPercent(mCurrentBytes, mTotalBytes));
++        } else {
++            expandedView.setTextViewText(R.id.progress_text, "");
++        }
+         expandedView.setImageViewResource(R.id.appIcon, mIcon);
+         n.contentView = expandedView;
+         n.contentIntent = mPendingIntent;

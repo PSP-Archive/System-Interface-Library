@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Strings used by the resource downloader. -->
+    <string name="download_kB">%1$s kB</string>
+    <string name="download_MB">%1$s MB</string>
+    <string name="download_GB">%1$s GB</string>
+    <string name="download_kBps">%1$s kB/s</string>
+    <string name="download_MBps">%1$s MB/s</string>
+    <string name="download_GBps">%1$s GB/s</string>
+    <string name="download_time_left">Time remaining: %1$s</string>
+    <string name="download_notification_time_left">%1$s left</string>
+    <string name="download_button_pause">Pause download</string>
+    <string name="download_button_resume">Resume download</string>
+    <string name="download_button_retry">Retry download</string>
+    <string name="download_button_cancel">Cancel download</string>
+    <string name="download_paused_mobile">Would you like to enable downloading over a mobile network? Depending on your data plan, this may cost you money.</string>
+    <string name="download_paused_mobile_2">If you choose not to enable downloading over a mobile network, the download will automatically resume when a Wi-Fi network is available.</string>
+    <string name="download_button_resume_mobile">Use mobile network</string>
+    <string name="download_button_wifi_settings">Check Wi-Fi settings</string>
+    <string name="download_state_idle">Waiting for download to start...</string>
+    <string name="download_state_fetching_url">Looking for resources to download...</string>
+    <string name="download_state_connecting">Connecting to the download server...</string>
+    <string name="download_state_downloading">Downloading resources...</string>
+    <string name="download_state_completed">Download finished.</string>
+    <string name="download_state_paused_network_unavailable">Download paused because no network is available.</string>
+    <string name="download_state_paused_by_request">Download paused.</string>
+    <string name="download_state_paused_wifi_disabled">Download paused because Wi-Fi is disabled.</string>
+    <string name="download_state_paused_wifi_unavailable">Download paused because Wi-Fi is unavailable.</string>
+    <string name="download_state_paused_network_setup_failure">Download paused due to network problems. Try opening a website in the browser.</string>
+    <string name="download_state_paused_roaming">Download paused because you are roaming.</string>
+    <string name="download_state_paused_sdcard_unavailable">Download paused because the external storage is unavailable.</string>
+    <string name="download_state_failed_unlicensed">Download failed - unable to verify that you have purchased this app.</string>
+    <string name="download_state_failed_fetching_url">Download failed because the resources could not be found.</string>
+    <string name="download_state_failed_sdcard_full">Download failed because the external storage is full.</string>
+    <string name="download_state_failed_canceled">Download cancelled.</string>
+    <string name="download_state_failed">Download failed.</string>
+
+    <!-- These override strings in the downloader library which are used
+         for notifications, so they should match the style used in other
+         notification messages. -->
+    <string name="state_idle">Waiting for download to start</string>
+    <string name="state_fetching_url">Looking for resources to download</string>
+    <string name="state_connecting">Connecting to the download server</string>
+    <string name="state_downloading">Downloading resources</string>
+    <string name="state_completed">Download finished</string>
+    <string name="state_paused_network_unavailable">Download paused - no network found</string>
+    <string name="state_paused_by_request">Download paused</string>
+    <string name="state_paused_wifi_disabled">Download paused - Wi-Fi disabled</string>
+    <string name="state_paused_wifi_unavailable">Download paused - Wi-Fi unavailable</string>
+    <string name="state_paused_network_setup_failure">Download paused - open a website in browser</string>
+    <string name="state_paused_roaming">Download paused - roaming</string>
+    <string name="state_paused_sdcard_unavailable">Download paused - external storage unavailable</string>
+    <string name="state_failed_unlicensed">Download failed - unable to verify license</string>
+    <string name="state_failed_fetching_url">Download failed - resources not found</string>
+    <string name="state_failed_sdcard_full">Download failed - external storage full</string>
+    <string name="state_failed_canceled">Download cancelled</string>
+    <string name="state_failed">Download failed</string>
+</resources>
+

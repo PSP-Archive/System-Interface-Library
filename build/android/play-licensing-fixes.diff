@@ -1,0 +1,23 @@
+# This patch fixes the following issue with the Google Play Licensing Library:
+#    - If a null value is passed as the signedData parameter to the
+#      verifyLicense() callback, the app dies with a NullPointerException.
+#      (The cause of the null value is unknown, but it was reproducible on
+#      Android 4.1.1 with no account on the device and no networks enabled.)
+#
+# Patch created by: Andrew Church <achurch@achurch.org>
+
+diff -urN play_licensing-orig/library/src/com/google/android/vending/licensing/LicenseValidator.java play_licensing/library/src/com/google/android/vending/licensing/LicenseValidator.java
+--- play_licensing-orig/library/src/com/google/android/vending/licensing/LicenseValidator.java	2013-02-06 20:17:26 +0900
++++ play_licensing/library/src/com/google/android/vending/licensing/LicenseValidator.java	2013-02-09 18:56:12 +0900
+@@ -87,6 +87,11 @@
+      * @param signature server signature
+      */
+     public void verify(PublicKey publicKey, int responseCode, String signedData, String signature) {
++        if (signedData == null) {
++            Log.e(TAG, "Null response from server.");
++            mCallback.dontAllow(Policy.RETRY);
++            return;
++        }
+         String userId = null;
+         // Skip signature check for unsuccessful requests
+         ResponseData data = null;

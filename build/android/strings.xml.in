@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name as displayed on the home screen or app list. -->
+    <string name="appName">@APP_NAME@</string>
+
+    <!-- Title for error dialogs. -->
+    <string name="SIL_error_title">Error</string>
+    <!-- Error text displayed on a fatal memory allocation error. -->
+    <string name="SIL_error_out_of_memory">"The system is out of memory! Cannot proceed."</string>
+    <!-- Error text displayed if the application data cannot be found. -->
+    <string name="SIL_error_no_app_data">"Unable to read application data! Cannot proceed."</string>
+    <!-- Error text displayed if the application data cannot be found and
+         the external storage directory is unavailable. -->
+    <string name="SIL_error_no_external_data">"Unable to read application data! Cannot proceed.\nMake sure your external storage (e.g., SD card) is\nconnected and writable, and restart your device."</string>
+    <!-- Error text displayed if the external storage directory is
+         unavailable. -->
+    <string name="SIL_error_no_external_data_nonfatal">"Unable to access external data folder!\nYou won't be able to save game data or settings.\nMake sure your external storage (e.g., SD card) is\nconnected and writable, and restart your device."</string>
+    <!-- Error text displayed if the internal storage directory is
+         unavailable. -->
+    <string name="SIL_error_no_internal_data">"Unable to access internal data folder! Cannot proceed.\nYour device's storage may be corrupt."</string>
+</resources>
+

@@ -1,0 +1,12 @@
+prefix=@PREFIX@
+exec_prefix=${prefix}
+libdir=@LIBDIR@
+includedir=@INCDIR@
+
+Name: webmdec
+Description: Decoder library for WebM audio/video streams
+Version: @VERSION@
+Requires:@REQUIRES__VORBIS@@REQUIRES__VPX@
+Conflicts:
+Libs: -L${libdir} -lwebmdec
+Cflags: -I${includedir}

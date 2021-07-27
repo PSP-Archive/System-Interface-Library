@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="@PACKAGE_NAME@"
+          android:versionCode="@PROGRAM_VERSION_CODE@"
+          android:versionName="@PROGRAM_VERSION@"
+          android:installLocation="auto">
+    @MANIFEST_PERMISSIONS@
+    <uses-sdk android:minSdkVersion="@TARGET_OS_VERSION@" android:targetSdkVersion="@TARGET_OS_VERSION_COMPAT@"/>
+    <uses-feature android:name="android.hardware.screen.@SCREEN_ORIENTATION@"/>
+    <uses-feature android:name="android.hardware.touchscreen.multitouch.jazzhand"/>
+    <uses-feature android:glEsVersion="@GL_ES_VERSION@"/>
+    <supports-screens android:smallScreens="false"
+                      android:normalScreens="true"
+                      android:largeScreens="true"
+                      android:xlargeScreens="true"/>
+    @DOWNLOADER_MANIFEST_GLOBAL@
+    <application android:label="@string/appName"
+                 @ICON_ATTRIBUTE@
+                 android:hasCode="true"
+                 android:debuggable="@DEBUGGABLE@">
+        <activity android:name=".SILActivity"
+                  android:alwaysRetainTaskState="true"
+                  android:configChanges="fontScale|keyboard|keyboardHidden|mcc|mnc|navigation|orientation|uiMode@CONFIG_CHANGES@"
+                  android:launchMode="singleTask"
+                  android:screenOrientation="@SCREEN_ORIENTATION_FULL@"
+                  android:windowSoftInputMode="stateHidden|adjustPan">
+            <meta-data android:name="android.app.lib_name"
+                       android:value="native"/>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                @INTENT_CATEGORIES_EXPANDED@
+            </intent-filter>
+        </activity>
+        <activity android:name=".RunTestsActivity"
+                  android:alwaysRetainTaskState="true"
+                  android:configChanges="fontScale|keyboard|keyboardHidden|mcc|mnc|navigation|uiMode@CONFIG_CHANGES@"
+                  android:launchMode="singleTask"
+                  android:screenOrientation="@SCREEN_ORIENTATION_FULL@"
+                  android:windowSoftInputMode="stateHidden|adjustPan">
+            <meta-data android:name="android.app.lib_name"
+                       android:value="native"/>
+            <intent-filter>
+                <action android:name="@PACKAGE_NAME@.action.RUN_TESTS"/>
+            </intent-filter>
+        </activity>
+        @DOWNLOADER_MANIFEST_ACTIVITY@
+        @MANIFEST_APPLICATION_EXTRA@
+    </application>
+    @MANIFEST_GLOBAL_EXTRA@
+</manifest>

@@ -1,0 +1,19 @@
+syntax: glob
+*.d
+*.o
+*.gcda
+*.gcno
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+syntax: regexp
+^coverage.txt$
+^nogg-benchmark$
+^nogg-decode$
+^tests/coverage$
+^tests/coverage-tests\.h$
+# Ignore all test executables.
+^tests/.*/[^./]+$

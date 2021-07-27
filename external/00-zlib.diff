@@ -1,0 +1,32 @@
+diff -r 4e0460b0fb21 external/zlib/adler32.c
+--- a/external/zlib/adler32.c	Tue Jan 03 12:58:09 2017 +0900
++++ b/external/zlib/adler32.c	Tue Jan 03 13:01:37 2017 +0900
+@@ -177,6 +177,7 @@
+     return adler32_combine_(adler1, adler2, len2);
+ }
+ 
++#ifdef Z_LARGE64
+ uLong ZEXPORT adler32_combine64(adler1, adler2, len2)
+     uLong adler1;
+     uLong adler2;
+@@ -184,3 +185,4 @@
+ {
+     return adler32_combine_(adler1, adler2, len2);
+ }
++#endif
+diff -r 4e0460b0fb21 external/zlib/crc32.c
+--- a/external/zlib/crc32.c	Tue Jan 03 12:58:09 2017 +0900
++++ b/external/zlib/crc32.c	Tue Jan 03 13:01:37 2017 +0900
+@@ -433,6 +433,7 @@
+     return crc32_combine_(crc1, crc2, len2);
+ }
+ 
++#ifdef Z_LARGE64
+ uLong ZEXPORT crc32_combine64(crc1, crc2, len2)
+     uLong crc1;
+     uLong crc2;
+@@ -440,3 +441,4 @@
+ {
+     return crc32_combine_(crc1, crc2, len2);
+ }
++#endif

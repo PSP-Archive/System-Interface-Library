@@ -1,0 +1,5 @@
+P0.txt = src/P0.txt
+P4.txt = src/P4.txt
+02.txt = src/02.txt
+deflate:DIR/square.dat = src/DIR/square.dat
+deflate:02.4zt = src/02.4zt

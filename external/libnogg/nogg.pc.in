@@ -1,0 +1,12 @@
+prefix=@PREFIX@
+exec_prefix=${prefix}
+libdir=@LIBDIR@
+includedir=@INCDIR@
+
+Name: nogg
+Description: Decoder library for Ogg Vorbis streams
+Version: @VERSION@
+Requires:
+Conflicts:
+Libs: -L${libdir} -lnogg -lm
+Cflags: -I${includedir}

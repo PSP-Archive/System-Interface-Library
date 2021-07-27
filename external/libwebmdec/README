@@ -1,0 +1,80 @@
+libwebmdec: a decoder library for WebM audio/video streams
+==========================================================
+Copyright (c) 2014-2019 Andrew Church <achurch@achurch.org>
+See the file "COPYING" for conditions on use and redistribution.
+
+Version: 0.9
+
+
+Overview
+--------
+libwebmdec is a simple wrapper library around the demuxer and decoder
+libraries used to decode WebM <http://www.webmproject.org/> audio/video
+streams.  libwebmdec provides a straightforward interface to those
+libraries, allowing users to easily decode WebM streams without the
+hassle of dealing with separate handles for each library.
+
+IMPORTANT: libwebmdec is still experimental software, and the public
+interface is subject to change as development proceeds (though efforts
+will be made to avoid unnecessary interface churn).  The interface will
+be finalized in version 1.0 of the library.
+
+
+Requirements
+------------
+As libwebmdec is a wrapper library, it relies on several other libraries
+to get its work done:
+   - libnestegg <https://github.com/kinetiknz/nestegg>
+   - libnogg <http://achurch.org/libnogg/> version 1.14 or later
+   - libvpx <https://chromium.googlesource.com/webm/libvpx/>
+These libraries must be available at runtime to programs using
+libwebmdec, either as dynamic libraries or statically linked into the
+program.
+
+Of the above libraries, only libnestegg is mandatory.  The other
+libraries are used to decode audio or video data, and libwebmdec can be
+compiled without them (in which case attempting to decode the
+corresponding type of data will result in an error).  The choice of
+which libraries to include must be made at build time; if a library
+included at build time is not present at runtime, programs using
+libwebmdec will be unable to start.
+
+In addition to the above runtime dependencies, GNU Make is required in
+order to build the library.
+
+
+Building
+--------
+If the required libraries (see above) are installed in standard
+locations on the build system, libwebmdec can be built by simply running
+the "make" command (or "gmake", if GNU Make is installed under that name
+on your system) in the top directory of the libwebmdec distribution.
+This will create shared and static library files in the top directory,
+which can then be installed on the system with "make install".
+
+Several configuration variables are available to control the build
+process or specify nonstandard paths for dependent libraries.  These can
+be set on the "make" command line; for example, "make BUILD_FRONTEND=1".
+See the "Configuration" section at the top of the "Makefile" file for
+details.
+
+
+Using libwebmdec
+----------------
+The file "tools/frontend.c" demonstrates how libwebmdec can be used to
+extract and decode the audio and video data from a WebM stream.
+
+See the documentation in webmdec.h for further details.
+
+
+Caveats
+-------
+If a WebM stream has multiple video or audio streams, libwebmdec will
+only decode the first such stream.
+
+In a 32-bit environment (more precisely, in an environment in which the
+C language "long" type is 32 bits wide), libwebmdec will only support
+streams of up to approximately 2GB in size.  This is a deliberate design
+decision, based on the current prevalence of 64-bit environments and the
+perceived low likelihood that a program which still needs to run in a
+32-bit environment would need to decode streams larger than 2GB in size.

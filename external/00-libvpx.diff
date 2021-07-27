@@ -1,0 +1,49 @@
+diff -r 49bde13e570b external/libvpx/vp8/vp8_dx_iface.c
+--- a/external/libvpx/vp8/vp8_dx_iface.c	Wed Dec 23 23:59:09 2015 +0900
++++ b/external/libvpx/vp8/vp8_dx_iface.c	Thu Dec 24 00:00:25 2015 +0900
+@@ -67,10 +67,13 @@
+     FRAGMENT_DATA           fragments;
+ };
+ 
+-static void vp8_init_ctx(vpx_codec_ctx_t *ctx)
++static int vp8_init_ctx(vpx_codec_ctx_t *ctx)
+ {
+     vpx_codec_alg_priv_t *priv =
+         (vpx_codec_alg_priv_t *)vpx_calloc(1, sizeof(*priv));
++    if (!priv) {
++        return 0;
++    }
+ 
+     ctx->priv = (vpx_codec_priv_t *)priv;
+     ctx->priv->init_flags = ctx->init_flags;
+@@ -85,6 +88,8 @@
+         priv->cfg = *ctx->config.dec;
+         ctx->config.dec = &priv->cfg;
+     }
++
++    return 1;
+ }
+ 
+ static vpx_codec_err_t vp8_init(vpx_codec_ctx_t *ctx,
+@@ -103,7 +108,9 @@
+      * information becomes known.
+      */
+     if (!ctx->priv) {
+-      vp8_init_ctx(ctx);
++      if (!vp8_init_ctx(ctx)) {
++         return VPX_CODEC_MEM_ERROR;
++      }
+       priv = (vpx_codec_alg_priv_t *)ctx->priv;
+ 
+       /* initialize number of fragments to zero */
+@@ -379,7 +386,9 @@
+        }
+ 
+        res = vp8_create_decoder_instances(&ctx->yv12_frame_buffers, &oxcf);
+-       ctx->decoder_init = 1;
++       if (!res) {
++         ctx->decoder_init = 1;
++       }
+     }
+ 
+     /* Set these even if already initialized.  The caller may have changed the

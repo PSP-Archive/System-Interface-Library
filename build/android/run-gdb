@@ -1,0 +1,190 @@
+#!/bin/sh
+#
+# System Interface Library for games
+# Copyright (c) 2007-2020 Andrew Church <achurch@achurch.org>
+# Released under the GNU GPL version 3 or later; NO WARRANTY is provided.
+# See the file COPYING.txt for details.
+#
+# build/android/run-gdb: Shell script to start gdb on the installed app
+# (like ndk-gdb, but better).  Assumes adb is in $PATH.
+#
+# Usage: ./run-gdb [options] [adb-global-opts] package-name
+# where options is any of:
+#    -g path (set target gdb path) -n (don't start app) -t (run tests)
+# where adb-global-opts is one of: -d | -e | -s serial-number
+#
+
+set -e
+
+###########################################################################
+
+# Path to the NDK.  This can be overridden from the command line with:
+#    ANDROID_NDK_ROOT=/path/to/ndk ./run-gdb [...]
+# or by setting ANDROID_NDK_ROOT in your environment.
+ANDROID_NDK_ROOT=${ANDROID_NDK_ROOT:-/opt/android-sdk-update-manager/android-ndk-r9d}
+
+# "adb" executable name.  If not in $PATH, override by passing ADB=... in
+# the environment.
+ADB=${ADB:-adb}
+
+# Name of the activity to run (with package specification or leading dot).
+APP_ACTIVITY=${APP_ACTIVITY:-.SILActivity}
+
+# Architecture of the target device.
+TARGET_ARCH=${TARGET_ARCH:-arm}
+
+# Name of the activity to run for testing.
+TEST_ACTIVITY=${TEST_ACTIVITY:-.RunTestsActivity}
+
+# TCP port for debugging.
+DEBUG_PORT=${DEBUG_PORT:-5039}
+
+###########################################################################
+
+PACKAGE_NAME=""
+START_APP=1
+ADB_OPTIONS=""
+GDB=""
+AM_ARGS="-a android.intent.action.MAIN -n"
+AM_ACTIVITY="$APP_ACTIVITY"
+
+while test -n "$1"; do
+    case "$1" in
+      -d|-e|-s*)
+        if test -n "$ADB_OPTIONS"; then
+            echo >&2 "$0: Only one of -d/-e/-s allowed"
+            exit 1
+        fi
+        ADB_OPTIONS=$1
+        if test "x$1" = "x-s"; then
+            shift
+            if test -z "$1"; then
+                echo >&2 "$0: Missing argument to -s"
+                exit 1
+            fi
+            ADB_OPTIONS="-s $1"
+        fi
+        shift
+        ;;
+      -g)
+        if test "x$1" = "x-g"; then
+            shift
+            if test -z "$1"; then
+                echo >&2 "$0: Missing argument to -g"
+                exit 1
+            fi
+            GDB="$1"
+        else
+            GDB="$(echo "$1" | sed -e 's/-g//')"
+        fi
+        shift
+        ;;
+      -n)
+        START_APP=""
+        shift
+        ;;
+      -t)
+        action=
+        AM_ARGS="-a ${PACKAGE_NAME}.action.RUN_TEST -n"
+        AM_ACTIVITY="$TEST_ACTIVITY"
+        shift
+        ;;
+      *)
+        if test "x-" != "`echo \"x$1\" | cut -c1-2`" -a -z "$PACKAGE_NAME"; then
+            PACKAGE_NAME="$1"
+            shift
+        else
+            echo >&2 "Usage: $0 [options] [adb-global-options] package-name"
+            echo >&2 "options: -g path-to-target-gdb  -n  -t"
+            echo >&2 "adb-global-options: -d | -e | -s serial-number"
+            exit 1
+        fi
+        ;;
+    esac
+done
+
+if test -z "$PACKAGE_NAME"; then
+    echo >&2 "Package name missing"
+    echo >&2 "Usage: $0 [options] [adb-global-options] package-name"
+    echo >&2 "options: -g path-to-target-gdb  -n  -t"
+    echo >&2 "adb-global-options: -d | -e | -s serial-number"
+    exit 1
+fi
+
+# Make sure we can run adb and gdb.
+if test -z "`type $ADB 2>/dev/null`"; then
+    echo >&2 "$0: Can't run adb!  Tried: $ADB"
+    exit 1
+fi
+if test -z "$GDB"; then
+    GDB="${ANDROID_NDK_ROOT}/prebuilt/linux-x86_64/bin/gdb"
+    if test ! -x "$GDB"; then
+        GDB="`ls -R \"${ANDROID_NDK_ROOT}\"/toolchains/${TARGET_ARCH}-*/prebuilt/*/bin/*-gdb | head -n1`"
+    fi
+    if test ! -x "$GDB"; then
+        echo >&2 "$0: Can't find gdb for target!  Check \$ANDROID_NDK_ROOT:"
+        echo >&2 "    $ANDROID_NDK_ROOT"
+        echo >&2 "Looked for GDB in:"
+        echo >&2 "    ${ANDROID_NDK_ROOT}/prebuilt/linux-x86_64/bin/gdb"
+        echo >&2 "    ${ANDROID_NDK_ROOT}/toolchains/${TARGET_ARCH}-*/prebuilt/*/bin/*-gdb"
+        exit 1
+    fi
+fi
+
+# Set up a temporary directory with necessary files.
+TMP=/tmp/gdb.$$
+mkdir $TMP
+trap "rm -rf $TMP" EXIT
+cp -p libs/"${TARGET_ARCH}"*/* $TMP/
+$ADB pull /system/bin/app_process $TMP/
+$ADB pull /system/lib/libc.so $TMP/
+PLATFORM_DIR=`ls -d $ANDROID_NDK_ROOT/platforms/* | tail -n1`
+cat >$TMP/gdb.setup <<EOF
+set solib-search-path $TMP
+dir `cd \`dirname "$0"\`/../..; pwd` $PLATFORM_DIR/arch-arm/usr/include $ANDROID_NDK_ROOT/sources/cxx-stl/system
+file $TMP/app_process
+target remote :$DEBUG_PORT
+EOF
+
+# Find out where the program's data directory lives (so we can put a socket
+# there).  Watch out for the \r tacked onto the end by adb!
+DATA_DIR=`$ADB shell run-as "$PACKAGE_NAME" /system/bin/sh -c pwd | perl -pe 's/\s+$//'`
+if test -z "$DATA_DIR"; then
+    echo >&2 "$0: Can't find data directory!"
+    exit 1
+fi
+
+# Kill any existing gdbserver processes.
+$ADB shell ps | fgrep lib/gdbserver | awk '{print $2}' | while read PID; do
+    echo "Killing existing gdbserver with PID $PID"
+    $ADB shell run-as "$PACKAGE_NAME" kill -9 $PID
+done
+
+# Launch the app if requested, and find the PID of its process.
+if test -n "$START_APP"; then
+    $ADB shell am start $AM_ARGS "${PACKAGE_NAME}/${AM_ACTIVITY}"
+fi
+PID=""
+TRIES=0
+while test -z "$PID" -a $TRIES -lt 20; do
+    PID=`$ADB shell ps | fgrep "$PACKAGE_NAME" | head -n1 | awk '{print $2}'`
+    if test -z "$PID"; then
+        sleep 0.1
+        TRIES=$[TRIES+1]
+    fi
+done
+if test -z "$PID"; then
+    echo >&2 "$0: Can't find PID of the app!  Did it fail to launch?"
+    exit 1
+fi
+echo "Process running as PID $PID"
+
+# Start up gdb on the process.
+$ADB shell run-as "$PACKAGE_NAME" lib/gdbserver +debug-socket --attach $PID &
+GDBSERVER_PID=$!
+$ADB forward tcp:$DEBUG_PORT localfilesystem:$DATA_DIR/debug-socket
+sleep 1  # Give the app time to start up.
+$GDB -x $TMP/gdb.setup || true  # Fall through even if gdb fails.
+
+# Kill the gdbserver we started, if it's still running.
+kill $GDBSERVER_PID || true
